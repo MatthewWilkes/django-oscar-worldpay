@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 from setuptools import setup, find_packages
 
-from paypal import VERSION
+from worldpay import VERSION
 
 
 setup(
-    name='django-oscar-paypal',
+    name='django-oscar-worldpay',
     version=VERSION,
-    url='https://github.com/tangentlabs/django-oscar-paypal',
+    url='https://github.com/matthewwilkes/django-oscar-worldpay',
     author="David Winterbottom",
     author_email="david.winterbottom@tangentlabs.co.uk",
     description=(
