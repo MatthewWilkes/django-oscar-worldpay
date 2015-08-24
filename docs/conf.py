@@ -61,7 +61,7 @@ copyright = u'2012, David Winterbottom'
 # built documents.
 #
 # The short X.Y version.
-from paypal import VERSION
+from . import VERSION
 version = VERSION
 # The full version, including alpha/beta/rc tags.
 release = VERSION

@@ -11,10 +11,9 @@ setup(
     author="David Winterbottom",
     author_email="david.winterbottom@tangentlabs.co.uk",
     description=(
-        "Integration with PayPal Express, PayPal Payflow Pro and Adaptive "
-        "Payments for django-oscar"),
+        "Integration with Worldpay payments for django-oscar"),
     long_description=open('README.rst').read(),
-    keywords="Payment, PayPal, Oscar",
+    keywords="Payment, WorldPay, Oscar",
     license=open('LICENSE').read(),
     platforms=['linux'],
     packages=find_packages(exclude=['sandbox*', 'tests*']),
@@ -27,7 +26,7 @@ setup(
     },
     # See http://pypi.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[
-        'Development Status :: 4 - Beta',
+        'Development Status :: 3 - Alpha',
         'Environment :: Web Environment',
         'Framework :: Django',
         'Intended Audience :: Developers',

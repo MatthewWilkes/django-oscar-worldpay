@@ -8,6 +8,7 @@ from oscar.core.loading import get_class, get_model
 
 from oscar.apps.payment.exceptions import RedirectRequired
 
+from facade import build_payment_url
 
 # Load views dynamically
 OscarPaymentDetailsView = get_class('checkout.views', 'PaymentDetailsView')
@@ -43,7 +44,7 @@ class CallbackResponseView(OrderPlacementMixin, View):
         total_incl_tax, total_excl_tax = self.get_order_totals(basket)
 
         # Record payment source
-        source_type, is_created = SourceType.objects.get_or_create(name='GoCardless')
+        source_type, is_created = SourceType.objects.get_or_create(name='WorldPay')
         source = Source(source_type=source_type,
                         currency='GBP',
                         amount_allocated=total_incl_tax,
@@ -69,9 +70,8 @@ class PaymentDetailsView(OscarPaymentDetailsView):
 
     def handle_payment(self, order_number, total, **kwargs):
         """
-        Complete payment with PayPal - this calls the 'DoExpressCheckout'
-        method to capture the money from the initial transaction.
+        Complete payment with WorldPay. This redirects into the WorldPay flow.
         """
-        
+        url = build_payment_url(order)
         raise RedirectRequired(url)
         

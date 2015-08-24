@@ -7,27 +7,8 @@ from django.conf import settings
 
 if not settings.configured:
     extra_settings = {
-        'PAYPAL_EXPRESS_URL': 'https://www.sandbox.paypal.com/webscr',
-        'PAYPAL_SANDBOX_MODE': True,
-        'PAYPAL_VERSION': '88.0',
-        'PAYPAL_PAYFLOW_TEST_MODE': True,
+
     }
-    # To specify integration settings (which include passwords, hence why they
-    # are not committed), create an integration.py module.
-    try:
-        from integration import *
-    except ImportError:
-        extra_settings.update({
-            'PAYPAL_API_USERNAME': '',
-            'PAYPAL_API_PASSWORD': '',
-            'PAYPAL_API_SIGNATURE': '',
-            'PAYPAL_PAYFLOW_VENDOR_ID': '',
-            'PAYPAL_PAYFLOW_PASSWORD': '',
-        })
-    else:
-        for key, value in list(locals().items()):
-            if key.startswith('PAYPAL'):
-                extra_settings[key] = value
 
     from oscar.defaults import *
     for key, value in list(locals().items()):
@@ -51,7 +32,7 @@ if not settings.configured:
             'django.contrib.sites',
             'django.contrib.flatpages',
             'django.contrib.staticfiles',
-            'paypal',
+            'worldpay',
             'compressor',
         ] + get_core_apps(),
         MIDDLEWARE_CLASSES=(
@@ -90,7 +71,7 @@ if not settings.configured:
         COMPRESS_ENABLED=False,
         STATIC_URL='/',
         STATIC_ROOT='/static/',
-        NOSE_ARGS=['-s', '--with-spec'],
+        NOSE_ARGS=['-s', '--with-specplugin'],
         **extra_settings
     )
 
@@ -104,7 +85,7 @@ def run_tests(*test_args):
     # Run tests
     test_runner = NoseTestSuiteRunner(verbosity=1)
 
-    c = coverage(source=['paypal'], omit=['*migrations*', '*tests*'],
+    c = coverage(source=['worldpay'], omit=['*migrations*', '*tests*'],
                  auto_data=True)
     c.start()
     num_failures = test_runner.run_tests(test_args)

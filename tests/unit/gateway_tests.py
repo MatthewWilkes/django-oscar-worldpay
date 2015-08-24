@@ -1,40 +1,19 @@
 from __future__ import unicode_literals
 from django.test import TestCase
-import mock
 
-from paypal.gateway import post
-
-# Fixtures
-ERROR_RESPONSE = 'RESULT=126&PNREF=V25A2BB645A7&RESPMSG=Under review by Fraud Service&AUTHCODE=525PNI&PREFPSMSG=Review: More than one rule was triggered for Review&POSTFPSMSG=Review'
-
-
-class TestErrorResponse(TestCase):
+class TestURLs(TestCase):
 
     def setUp(self):
-        with mock.patch('requests.post') as mock_post:
-            response = mock.Mock()
-            response.status_code = 200
-            response.text = ERROR_RESPONSE
-            mock_post.return_value = response
-            self.pairs = post('http://example.com', {})
+        from worldpay.gateway import build_payment_url
+        self.build_payment_url = build_payment_url
+    
+    def test_simple_payment_url_is_as_expected(self):
+        url = self.build_payment_url('12345', '6789', '12.00', 'GBP')
+        self.assertNotIn('testMode', url)
+        self.assertEqual(url, 'https://secure.worldpay.com/wcc/purchase?currency=GBP&instId=12345&amount=12.00&desc=&cartId=6789')
 
-    def test_return_value_includes_response_time(self):
-        self.assertTrue('_response_time' in self.pairs)
-
-    def test_return_value_keys(self):
-        expected = {
-            'RESULT': '126',
-            'PNREF': 'V25A2BB645A7',
-            'RESPMSG': 'Under review by Fraud Service',
-            'AUTHCODE': '525PNI',
-            'POSTFPSMSG': 'Review'
-        }
-        for key, value in expected.items():
-            self.assertEqual(value, self.pairs[key])
-
-    def test_audit_information_is_included(self):
-        expected = ['_raw_request',
-                    '_raw_response',
-                    '_response_time']
-        for key in expected:
-            self.assertTrue(key in self.pairs)
+    def test_test_mode_is_opt_in(self):
+        url = self.build_payment_url('12345', '6789', '12.00', 'GBP', True)
+        self.assertIn('testMode', url)
+        self.assertEqual(url, 'https://secure-test.worldpay.com/wcc/purchase?cartId=6789&instId=12345&currency=GBP&amount=12.00&testMode=100&desc=')
+    
