@@ -1,6 +1,9 @@
 from __future__ import unicode_literals
 
-from urllib import urlencode
+try:
+    from urllib import urlencode
+except ImportError:
+    from urllib.parse import urlencode
 
 
 def build_payment_url(instance_id, cart_id, total, currency, test_mode=False):
