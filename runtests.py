@@ -7,7 +7,7 @@ from django.conf import settings
 
 if not settings.configured:
     extra_settings = {
-
+        'WORLDPAY_INSTANCE_ID': '12345',
     }
 
     from oscar.defaults import *
@@ -81,6 +81,8 @@ from django_nose import NoseTestSuiteRunner
 def run_tests(*test_args):
     if not test_args:
         test_args = ['tests']
+
+    test_args += ['--nologcapture', ]
 
     # Run tests
     test_runner = NoseTestSuiteRunner(verbosity=1)
