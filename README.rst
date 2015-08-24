@@ -43,7 +43,7 @@ Having problems or got a question?
 Tests
 -----
 
-.. image:: https://secure.travis-ci.org/matthewwilkes/django-oscar-worldpay.png
+.. image:: https://travis-ci.org/MatthewWilkes/django-oscar-worldpay.png
     :alt: Continuous integration status
     :target: http://travis-ci.org/#!/matthewwilkes/django-oscar-worldpay
 
