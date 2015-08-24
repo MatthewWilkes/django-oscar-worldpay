@@ -27,9 +27,8 @@ urlpatterns = [
 
 # Prefix Oscar URLs with language codes
 urlpatterns += i18n_patterns('',
-    # Custom functionality to allow dashboard users to be created
-    url(r'gateway/', include('apps.gateway.urls')),
     # Oscar's normal URLs
+    (r'^checkout/worldpay/', include('worldpay.urls')),
     url(r'', include(application.urls)),
 )
 

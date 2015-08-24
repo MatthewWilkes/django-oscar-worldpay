@@ -1,0 +1,47 @@
+{% extends "checkout/preview.html" %}
+{% load currency_filters %}
+{% load i18n %}
+{% load url from future %}
+{% load thumbnail %}
+
+{# Null out the actions as they can't be used here #}
+{% block shipping_address_actions %}{% endblock %}
+{% block shipping_method_actions %}{% endblock %}
+{% block order_contents_actions %}{% endblock %}
+
+{% block payment_method %}
+    <div class="col-sm-6">
+        <div class="sub-header">
+            <h2>{% trans "Payment" %}</h2>
+        </div>
+        <div class="well well-success">
+            <h4>{% trans "Card Payment" %}</h4>
+            <p>
+              On the next page you will be prompted for payment details.
+              {{ order_total.incl_tax|currency:basket.currency }} will be charged to your selected card.
+            </p>
+        </div>
+    </div>
+{% endblock %}
+
+{# Note, we submit to a different URL for placing an Express order #}
+{% block place_order %}
+<h1>Pay now</h1>
+
+<form action="https://secure-test.worldpay.com/wcc/purchase" name=BuyForm method=POST>
+<input type="hidden" name="instId"  value="{{ WORLDPAY_INSTANCE_ID }}">
+<input type="hidden" name="cartId" value="WorldPay Test page">
+<input type="hidden" name="currency" value="{{ basket.currency }}">
+<input type="hidden" name="amount"  value="{{ order_total.incl_tax }}">
+<input type="hidden" name="desc" value="">
+<input type="hidden" name="M_recipient" value="tiq@uk.worldpay.com">
+<input type="hidden" name="M_subject" value="WorldPay example">
+<input type="hidden" name="testMode" value="100">
+<input type="hidden" name="MC_callback" value="{{ worldpay_callback }}">
+
+  <input type="submit" value="Pay now" />
+</form>
+
+<script language="JavaScript" src="https://secure.worldpay.com/wcc/logo?instId={{ WORLDPAY_INSTANCE_ID }}"></script>
+
+{% endblock place_order %}
