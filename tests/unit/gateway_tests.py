@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 from django.test import TestCase
 
-class TestURLs(TestCase):
+class TestUrlGeneration(TestCase):
 
     def setUp(self):
         from worldpay.gateway import build_payment_url
