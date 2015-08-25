@@ -20,7 +20,9 @@ setup(
     include_package_data=True,
     install_requires=[
         'requests>=1.0',
-        'django-localflavor'],
+        'django-localflavor',
+        'six',
+    ],
     extras_require={
         'oscar': ["django-oscar>=0.6"]
     },

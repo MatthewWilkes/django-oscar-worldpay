@@ -11,6 +11,7 @@ from oscar.test.factories import create_product
 from oscar.test.factories import create_order
 from oscar.test.factories import create_basket
 import pytz
+from six import text_type
 
 
 class TestUrlsFromOrder(TestCase):
@@ -31,12 +32,12 @@ class TestUrlsFromOrder(TestCase):
         self.build_payment_url = build_payment_url
     
     def test_simple_payment_url_is_as_expected(self):
-        url = self.build_payment_url(self.order.number, unicode(self.order.basket_total_incl_tax), self.order.currency)
+        url = self.build_payment_url(self.order.number, text_type(self.order.basket_total_incl_tax), self.order.currency)
         self.assertNotIn('testMode', url)
         self.assertEqual(url, 'https://secure.worldpay.com/wcc/purchase?instId=12345&cartId=10001&currency=GBP&amount=10.58&desc=')
 
     def test_test_mode_is_opt_in(self):
-        url = self.build_payment_url(self.order.number, unicode(self.order.basket_total_incl_tax), self.order.currency, test_mode=True)
+        url = self.build_payment_url(self.order.number, text_type(self.order.basket_total_incl_tax), self.order.currency, test_mode=True)
         self.assertIn('testMode', url)
         self.assertEqual(url, 'https://secure-test.worldpay.com/wcc/purchase?instId=12345&cartId=10001&currency=GBP&amount=10.58&desc=&testMode=100')
     
