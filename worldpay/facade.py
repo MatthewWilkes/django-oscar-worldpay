@@ -1,7 +1,7 @@
 from django.conf import settings
 from oscar.apps.payment.exceptions import PaymentError
 
-import gateway
+from . import gateway
 
 
 def build_payment_url(order_number, total, currency, test_mode=False):

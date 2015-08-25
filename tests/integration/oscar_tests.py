@@ -10,7 +10,6 @@ from oscar.apps.payment.exceptions import PaymentError
 from oscar.test.factories import create_product
 from oscar.test.factories import create_order
 from oscar.test.factories import create_basket
-from oscar.test.factories import UserFactory
 import pytz
 
 
@@ -18,7 +17,6 @@ class TestUrlsFromOrder(TestCase):
 
     def setUp(self):
         from django.conf import settings
-        self.user = UserFactory()
         self.products = [create_product(price=Decimal('2.17')),
                          create_product(price=Decimal('3.12'))]
         
@@ -27,7 +25,7 @@ class TestUrlsFromOrder(TestCase):
         basket.add_product(self.products[0])
         basket.add_product(self.products[1])
         basket.add_product(self.products[1])
-        self.order = create_order(number='10001', basket=basket, user=self.user, date_placed=datetime(2015, 1, 2, 3, 13, 45, 0, pytz.UTC).isoformat())
+        self.order = create_order(number='10001', basket=basket)
     
         from worldpay.facade import build_payment_url
         self.build_payment_url = build_payment_url
