@@ -10,7 +10,7 @@ except ImportError:
 from six import binary_type
 
 
-def build_payment_url(instance_id, cart_id, total, currency, M_params=None, secret=None, test_mode=False):
+def build_payment_url(instance_id, cart_id, total, currency, worldpay_params=None, M_params=None, secret=None, test_mode=False):
     data = (
         ('instId',      instance_id),
         ('cartId',      cart_id),
@@ -30,7 +30,10 @@ def build_payment_url(instance_id, cart_id, total, currency, M_params=None, secr
             auth.update(urlencode(M_params))
             data += (b'M_authenticator', auth.hexdigest()), 
         
-
+    if worldpay_params is not None:
+        worldpay_params = sorted(worldpay_params.items())
+        data += tuple(worldpay_params)
+    
     if test_mode:
         data += ('testMode', 100),
         base = "https://secure-test.worldpay.com/wcc/purchase?"

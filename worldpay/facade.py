@@ -1,3 +1,5 @@
+import json
+
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from oscar.apps.payment.exceptions import PaymentError
@@ -20,6 +22,10 @@ def build_payment_url(order_number, user, basket, shipping_method, shipping_addr
     shipping_address.save()
     if billing_address is not None:
         billing_address.save()
+        address = billing_address
+    else:
+        address = shipping_address
+    
     M_params.update({
         'user': user_id,
         'basket': basket_id,
@@ -27,7 +33,26 @@ def build_payment_url(order_number, user, basket, shipping_method, shipping_addr
         'shipping_address': shipping_address.pk,
         'billing_address': getattr(billing_address, 'pk', None),
     })
-    return gateway.build_payment_url(instance_id, cart_id, total, currency, M_params=M_params, secret=settings.SECRET_KEY, test_mode=test_mode)
+    
+    worldpay_params = {
+        'fixContact': True,
+        'hideContact': False,
+        
+        'name':     address.name,
+        'address1': address.line1,
+        'address2': address.line2,
+        'address3': address.line3,
+        'town':     address.city,
+        'region':   address.state,
+        'postcode': address.postcode,
+        'tel':      address.phone_number,
+        'country':  address.country.code
+    }
+    try:
+        worldpay_params['email'] = user.email
+    except AttributeError:
+        worldpay_params['email'] = json.loads(M_params['order_kwargs'])["guest_email"]
+    return gateway.build_payment_url(instance_id, cart_id, total, currency, worldpay_params=worldpay_params, M_params=M_params, secret=settings.SECRET_KEY, test_mode=test_mode)
 
 def confirm(request):
     if not check_ip(request):
