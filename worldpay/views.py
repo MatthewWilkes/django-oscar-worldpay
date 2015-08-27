@@ -7,7 +7,7 @@ from django.contrib.auth.models import User, AnonymousUser
 from django.conf import settings
 from django.contrib import messages
 from django.core.urlresolvers import reverse
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.views.generic import View
 from oscar.apps.payment.exceptions import UnableToTakePayment
 from oscar.apps.checkout.views import OrderPlacementMixin
@@ -55,7 +55,7 @@ class SuccessView(OrderPlacementMixin, View):
         return response
     
 
-class FailView(OscarPaymentDetailsView):
+class FailView(OrderPlacementMixin, View):
     """
     Handle a failed sale
     """
@@ -63,7 +63,7 @@ class FailView(OscarPaymentDetailsView):
     def get(self, request, *args, **kwargs):
         # Flush all session data
         self.restore_frozen_basket()
-        return self.render_preview(self.request)
+        return HttpResponseRedirect(reverse('checkout:preview'))
     
 
 class CallbackResponseView(OrderPlacementMixin, View):
@@ -76,7 +76,10 @@ class CallbackResponseView(OrderPlacementMixin, View):
         except PaymentError as e:
             messages.error(self.request, str(e))
             #self.restore_frozen_basket()
-            return HttpResponseRedirect(reverse('checkout:payment-details'))
+            return HttpResponse("""
+<WPDISPLAY ITEM=banner>
+<meta http-equiv="refresh" content="3; url=%s">
+""" % self.request.build_absolute_uri(reverse("worldpay-fail")))
 
         basket = Basket.objects.get(pk=data['M_basket'])
         basket.strategy = Selector().strategy()
@@ -95,7 +98,8 @@ class CallbackResponseView(OrderPlacementMixin, View):
         source = Source(source_type=source_type,
                         currency=data['currency'],
                         amount_allocated=total,
-                        amount_debited=total)
+                        amount_debited=total,
+                        reference=data['transId'])
         self.add_payment_source(source)
         
         shipping_address = ShippingAddress.objects.get(pk=data['M_shipping_address'])
@@ -110,7 +114,7 @@ class CallbackResponseView(OrderPlacementMixin, View):
         order_kwargs = json.loads(data['M_order_kwargs'])
         # Place order
         calc_total = self.get_order_totals(basket, shipping_method.calculate(basket))
-        return self.handle_order_placement(
+        result = self.handle_order_placement(
             order_number,
             user,
             basket,
@@ -121,6 +125,11 @@ class CallbackResponseView(OrderPlacementMixin, View):
             calc_total,
             **order_kwargs
         )
+        return HttpResponse("""
+<WPDISPLAY ITEM=banner>
+<meta http-equiv="refresh" content="3; url=%s">
+""" % self.request.build_absolute_uri(reverse("worldpay-success")))
+        
     
 
 class PaymentDetailsView(OscarPaymentDetailsView):
