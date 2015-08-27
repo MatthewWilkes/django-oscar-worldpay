@@ -52,7 +52,10 @@ def check_ip(ip):
     try:
         hostname, aliaslist, ipaddrlist = socket.gethostbyaddr(ip)
     except socket.herror:
-        # No reverse DNS available
+        # No reverse DNS service available
+        return False
+    except socket.gaierror:
+        # No match
         return False
     
     if hostname.endswith(".worldpay.com") or hostname.endswith(".rbsworldpay.com"):

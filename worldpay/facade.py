@@ -66,5 +66,6 @@ def check_ip(request):
         header = settings.WORLDPAY_REMOTE_ADDRESS_HEADER
     except AttributeError:
         header = 'REMOTE_ADDR'
-    ip = request.META[header]
+    # Handle X-Forwarded-For
+    ip = request.META[header].split(',')[0]
     return gateway.check_ip(ip)
