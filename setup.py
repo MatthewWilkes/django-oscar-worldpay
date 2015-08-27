@@ -8,8 +8,8 @@ setup(
     name='django-oscar-worldpay',
     version=VERSION,
     url='https://github.com/matthewwilkes/django-oscar-worldpay',
-    author="David Winterbottom",
-    author_email="david.winterbottom@tangentlabs.co.uk",
+    author="Matthew Wilkes",
+    author_email="django-oscar-worldpay@matthewwilkes.name",
     description=(
         "Integration with Worldpay payments for django-oscar"),
     long_description=open('README.rst').read(),

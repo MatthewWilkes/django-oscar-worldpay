@@ -9,7 +9,6 @@ Worldpay package for django-oscar
 .. image:: https://coveralls.io/repos/MatthewWilkes/django-oscar-worldpay/badge.svg?branch=master&service=github
     :target: https://coveralls.io/github/MatthewWilkes/django-oscar-worldpay?branch=master
 
-
 This package provides integration between django-oscar_ and Worldpay Select Junior.
 
 .. _django-oscar: https://github.com/tangentlabs/django-oscar
