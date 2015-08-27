@@ -13,5 +13,10 @@ urlpatterns = patterns('',
     # Callback
     url(r'callback$', csrf_exempt(views.CallbackResponseView.as_view()),
         name='worldpay-callback'),
+
+    url(r'success$', views.SuccessView.as_view(),
+        name='worldpay-success'),
+    url(r'fail$', views.FailView.as_view(),
+        name='worldpay-fail'),
     
 )

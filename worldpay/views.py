@@ -28,12 +28,43 @@ Country = get_model('address', 'Country')
 Basket = get_model('basket', 'Basket')
 Repository = get_class('shipping.repository', 'Repository')
 Applicator = get_class('offer.utils', 'Applicator')
+Order = get_model('order', 'Order')
 Selector = get_class('partner.strategy', 'Selector')
 Source = get_model('payment', 'Source')
 SourceType = get_model('payment', 'SourceType')
 
 logger = logging.getLogger('worldpay')
 
+
+class SuccessView(OrderPlacementMixin, View):
+    """
+    Handle a successful sale
+    """
+    
+    def get(self, request, *args, **kwargs):
+        order_number = self.checkout_session.get_order_number()
+        # Flush all session data
+        self.checkout_session.flush()
+
+        # Save order id in session so thank-you page can load it
+        order = Order.objects.get(number=order_number)
+        self.request.session['checkout_order_id'] = order.id
+
+        response = HttpResponseRedirect(self.get_success_url())
+        self.send_signal(self.request, response, order)
+        return response
+    
+
+class FailView(OscarPaymentDetailsView):
+    """
+    Handle a failed sale
+    """
+    
+    def get(self, request, *args, **kwargs):
+        # Flush all session data
+        self.restore_frozen_basket()
+        return self.render_preview(self.request)
+    
 
 class CallbackResponseView(OrderPlacementMixin, View):
     """
