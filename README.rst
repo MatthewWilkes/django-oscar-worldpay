@@ -47,9 +47,8 @@ Tests
     :alt: Continuous integration status
     :target: http://travis-ci.org/#!/matthewwilkes/django-oscar-worldpay
 
-.. image:: https://coveralls.io/repos/matthewwilkes/django-oscar-worldpay/badge.png?branch=master
-    :alt: Coverage
-    :target: https://coveralls.io/r/matthewwilkes/django-oscar-worldpay
+.. image:: https://coveralls.io/repos/MatthewWilkes/django-oscar-worldpay/badge.svg?branch=master&service=github
+    :target: https://coveralls.io/github/MatthewWilkes/django-oscar-worldpay?branch=master
 
 Changelog
 ---------
