@@ -2,7 +2,8 @@
 Worldpay package for django-oscar
 =================================
 
-This package provides integration between django-oscar_ and Worldpay Junior.
+
+This package provides integration between django-oscar_ and Worldpay Select Junior.
 
 .. _django-oscar: https://github.com/tangentlabs/django-oscar
 
@@ -12,6 +13,19 @@ package is structured so that it can be used without Oscar if you so wish.
 * `Full documentation`_
 
 .. _`Continuous integration status`: http://travis-ci.org/#!/matthewwilkes/django-oscar-worldpay?branch=master
+
+Current status
+--------------
+
+This package is not yet suitable for use. It is under active development.
+Specifically, the following features are missing:
+
+* MD5 hashing of request parameters
+* Shared passwords
+* Dynamic payment responses
+* Validation of HMACs for internal parameters
+
+Only once these are in place will the package be usable.
 
 License
 -------
@@ -56,7 +70,7 @@ Changelog
 0.1
 ~~~
 
-* Nothing yet
+* Skeleton of Worldpay integration, supporting making requests and receiving callbacks.
 
 0.0
 ~~~
