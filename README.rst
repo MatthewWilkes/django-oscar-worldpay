@@ -2,16 +2,35 @@
 Worldpay package for django-oscar
 =================================
 
-This package provides integration between django-oscar_ and Worldpay Junior.
+.. image:: https://travis-ci.org/MatthewWilkes/django-oscar-worldpay.png
+    :alt: Continuous integration status
+    :target: http://travis-ci.org/#!/matthewwilkes/django-oscar-worldpay
+
+.. image:: https://coveralls.io/repos/MatthewWilkes/django-oscar-worldpay/badge.svg?branch=master&service=github
+    :target: https://coveralls.io/github/MatthewWilkes/django-oscar-worldpay?branch=master
+
+
+This package provides integration between django-oscar_ and Worldpay Select Junior.
 
 .. _django-oscar: https://github.com/tangentlabs/django-oscar
 
 These payment options can be used individually or together.  Further, the
 package is structured so that it can be used without Oscar if you so wish.
 
-* `Full documentation`_
-
 .. _`Continuous integration status`: http://travis-ci.org/#!/matthewwilkes/django-oscar-worldpay?branch=master
+
+Current status
+--------------
+
+This package is not yet suitable for use. It is under active development.
+Specifically, the following features are missing:
+
+* MD5 hashing of request parameters
+* Shared passwords
+* Dynamic payment responses
+* Validation of HMACs for internal parameters
+
+Only once these are in place will the package be usable.
 
 License
 -------
@@ -40,23 +59,13 @@ Having problems or got a question?
 .. _`django-oscar@googlegroups.com`: https://groups.google.com/forum/?fromgroups#!forum/django-oscar
 .. _`Github`: http://github.com/matthewwilkes/django-oscar-worldpay
 
-Tests
------
-
-.. image:: https://travis-ci.org/MatthewWilkes/django-oscar-worldpay.png
-    :alt: Continuous integration status
-    :target: http://travis-ci.org/#!/matthewwilkes/django-oscar-worldpay
-
-.. image:: https://coveralls.io/repos/MatthewWilkes/django-oscar-worldpay/badge.svg?branch=master&service=github
-    :target: https://coveralls.io/github/MatthewWilkes/django-oscar-worldpay?branch=master
-
 Changelog
 ---------
 
 0.1
 ~~~
 
-* Nothing yet
+* Skeleton of Worldpay integration, supporting making requests and receiving callbacks.
 
 0.0
 ~~~
