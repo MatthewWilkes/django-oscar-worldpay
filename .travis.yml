@@ -26,7 +26,7 @@ install:
     - pip install $COMBO -r requirements.txt -e .
 
 script:
-    - coverage run ./runtests.py
+    - coverage run --source=worldpay ./runtests.py
 
 after_success:
     - coveralls
