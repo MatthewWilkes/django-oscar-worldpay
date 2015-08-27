@@ -19,5 +19,5 @@ class TestUrlGeneration(TestCase):
     def test_additional_parameters_are_passed_and_protected(self):
         url = build_payment_url('12345', '6789', '12.00', 'GBP', M_params={'one': 'two'}, secret=b"gobbledegook", test_mode=True)
         self.assertIn('testMode', url)
-        self.assertEqual('https://secure-test.worldpay.com/wcc/purchase?instId=12345&cartId=6789&currency=GBP&amount=12.00&desc=&M_one=two&M_authenticator=978e26e1c882457ac8227eba5f28242f7929c54ca4caaac75a31212a83aa5b4e&testMode=100', url)
+        self.assertEqual('https://secure-test.worldpay.com/wcc/purchase?instId=12345&cartId=6789&currency=GBP&amount=12.00&desc=&M_one=two&M_authenticator=9af607fbc8aa172cd2ff6ed1bbc91c7724edcc22a87836b55f1bb940778d6211&testMode=100', url)
     

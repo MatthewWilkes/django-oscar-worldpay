@@ -18,7 +18,9 @@ from six import text_type
 
 
 class TestUrlsFromOrder(TestCase):
-
+    
+    maxDiff = 2500
+    
     def setUp(self):
         from django.conf import settings
         self.products = [create_product(price=Decimal('2.17')),
@@ -41,12 +43,12 @@ class TestUrlsFromOrder(TestCase):
     def test_simple_payment_url_is_as_expected(self):
         url = self.build_payment_url(self.order.number, self.order.user, self.basket, shipping_methods.Free(), self.address, None)
         self.assertNotIn('testMode', url)
-        self.assertEqual('https://secure.worldpay.com/wcc/purchase?instId=12345&cartId=10001&currency=GBP&amount=10.58&desc=&M_basket=1&M_billing_address=None&M_shipping_address=1&M_shipping_method=free-shipping&M_user=None&M_authenticator=9fac05e9255d19ecc169af63c86c85ad85f87177bb608d8a26a11bff874cf006', url)
+        self.assertEqual('https://secure.worldpay.com/wcc/purchase?instId=12345&cartId=10001&currency=GBP&amount=10.58&desc=&M_basket=1&M_billing_address=None&M_shipping_address=1&M_shipping_method=free-shipping&M_user=None&M_authenticator=74d8d7cb9626e833c365b2cf29ed1b8d31c99d0ef8156cf60cd6d125cb272636', url)
 
     def test_test_mode_is_opt_in(self):
         url = self.build_payment_url(self.order.number, self.order.user, self.basket, shipping_methods.Free(), self.address, None, test_mode=True)
         self.assertIn('testMode', url)
-        self.assertEqual('https://secure-test.worldpay.com/wcc/purchase?instId=12345&cartId=10001&currency=GBP&amount=10.58&desc=&M_basket=1&M_billing_address=None&M_shipping_address=1&M_shipping_method=free-shipping&M_user=None&M_authenticator=9fac05e9255d19ecc169af63c86c85ad85f87177bb608d8a26a11bff874cf006&testMode=100', url)
+        self.assertEqual('https://secure-test.worldpay.com/wcc/purchase?instId=12345&cartId=10001&currency=GBP&amount=10.58&desc=&M_basket=1&M_billing_address=None&M_shipping_address=1&M_shipping_method=free-shipping&M_user=None&M_authenticator=74d8d7cb9626e833c365b2cf29ed1b8d31c99d0ef8156cf60cd6d125cb272636&testMode=100', url)
     
 
 class TestConfirmOrder(TestCase):
