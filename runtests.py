@@ -8,6 +8,8 @@ from django.conf import settings
 if not settings.configured:
     extra_settings = {
         'WORLDPAY_INSTANCE_ID': '12345',
+        'WORLDPAY_TEST_MODE': True,
+        'SECRET_KEY': 'this is a secret so be very, very quiet'
     }
 
     from oscar.defaults import *

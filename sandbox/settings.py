@@ -465,3 +465,6 @@ try:
     from settings_local import *
 except ImportError:
     pass
+
+WORLDPAY_TEST_MODE = True
+WORLDPAY_REMOTE_ADDRESS_HEADER = 'REMOTE_ADDR'

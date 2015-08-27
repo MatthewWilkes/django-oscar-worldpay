@@ -28,7 +28,7 @@ urlpatterns = [
 # Prefix Oscar URLs with language codes
 urlpatterns += i18n_patterns('',
     # Oscar's normal URLs
-    (r'^checkout/worldpay/', include('worldpay.urls')),
+    (r'^checkout/', include('worldpay.urls')),
     url(r'', include(application.urls)),
 )
 

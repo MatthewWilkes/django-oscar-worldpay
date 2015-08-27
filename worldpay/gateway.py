@@ -1,12 +1,16 @@
 from __future__ import unicode_literals
+import hashlib
+import hmac
 import socket
 try:
     from urllib import urlencode
 except ImportError:
     from urllib.parse import urlencode
 
+from six import binary_type
 
-def build_payment_url(instance_id, cart_id, total, currency, test_mode=False):
+
+def build_payment_url(instance_id, cart_id, total, currency, M_params=None, secret=None, test_mode=False):
     data = (
         ('instId',      instance_id),
         ('cartId',      cart_id),
@@ -14,6 +18,19 @@ def build_payment_url(instance_id, cart_id, total, currency, test_mode=False):
         ('amount',      total),
         ('desc',        ''),
     )
+    if M_params is not None:
+        M_params = sorted((b"M_%s" % key, b'%s' % value) for (key, value) in M_params.items())
+        data += tuple(M_params)
+        if secret is not None:
+            # Generate a HMAC to verify our data is untouched
+            auth = hmac.new(secret, digestmod=hashlib.sha256)
+            auth.update(binary_type(cart_id))
+            auth.update(binary_type(total))
+            auth.update(binary_type(currency))
+            auth.update(urlencode(M_params))
+            data += (b'M_authenticator', auth.hexdigest()), 
+        
+
     if test_mode:
         data += ('testMode', 100),
         base = "https://secure-test.worldpay.com/wcc/purchase?"
@@ -24,7 +41,7 @@ def build_payment_url(instance_id, cart_id, total, currency, test_mode=False):
 
 
 def confirm(request):
-    return {}
+    return request.POST
 
 def check_ip(ip):
     """Check if an IP address has a reverse DNS that matches worldpay.com, and if
