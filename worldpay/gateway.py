@@ -44,6 +44,8 @@ def build_payment_url(instance_id, cart_id, total, currency, worldpay_params=Non
 
 
 def confirm(request):
+    if request.POST['transStatus'] != 'Y':
+        raise ValueError()
     return request.POST
 
 def check_ip(ip):
