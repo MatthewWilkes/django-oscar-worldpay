@@ -9,7 +9,9 @@ if not settings.configured:
     extra_settings = {
         'WORLDPAY_INSTANCE_ID': '12345',
         'WORLDPAY_TEST_MODE': True,
-        'SECRET_KEY': 'this is a secret so be very, very quiet'
+        'SECRET_KEY': 'this is a secret so be very, very quiet',
+        'WORLDPAY_MD5_SECRET': 'ajdk2323nm2,2.',
+        'WORLDPAY_SIGNATURE_FIELDS': ('cartId', 'amount', 'currency'),
     }
 
     from oscar.defaults import *

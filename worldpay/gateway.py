@@ -10,7 +10,7 @@ except ImportError:
 from six import binary_type
 
 
-def build_payment_url(instance_id, cart_id, total, currency, worldpay_params=None, M_params=None, secret=None, test_mode=False):
+def build_payment_url(instance_id, cart_id, total, currency, worldpay_params=None, M_params=None, secret=None, SignatureFields=None, MD5Secret=None, test_mode=False):
     data = (
         ('instId',      instance_id),
         ('cartId',      cart_id),
@@ -36,6 +36,12 @@ def build_payment_url(instance_id, cart_id, total, currency, worldpay_params=Non
     if worldpay_params is not None:
         worldpay_params = sorted(worldpay_params.items())
         data += tuple(worldpay_params)
+    
+    if SignatureFields is not None and MD5Secret is not None:
+        # Add an MD5 hash of the fields specified as a signature
+        values = (MD5Secret,) + tuple(map(dict(data).get, SignatureFields))
+        to_hash = b":".join(values)
+        data += ('signature', hashlib.md5(to_hash).hexdigest()), 
     
     if test_mode:
         data += ('testMode', 100),

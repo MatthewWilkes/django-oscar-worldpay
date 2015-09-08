@@ -4,7 +4,7 @@ Worldpay package for django-oscar
 
 .. image:: https://travis-ci.org/MatthewWilkes/django-oscar-worldpay.png
     :alt: Continuous integration status
-    :target: http://travis-ci.org/#!/MatthewWilkes/django-oscar-worldpay
+    :target: http://travis-ci.org/#!/MatthewWilkes./django-oscar-worldpay
 
 .. image:: https://coveralls.io/repos/MatthewWilkes/django-oscar-worldpay/badge.svg?branch=master&service=github
     :target: https://coveralls.io/github/MatthewWilkes/django-oscar-worldpay?branch=master
@@ -24,12 +24,29 @@ Current status
 This package is not yet suitable for use. It is under active development.
 Specifically, the following features are missing:
 
-* MD5 hashing of request parameters
 * Shared passwords
 * Dynamic payment responses
 * Validation of HMACs for internal parameters
 
 Only once these are in place will the package be usable.
+
+Configuration
+-------------
+
+The following parameters should be set:
+
+    * WORLDPAY_INSTANCE_ID
+        A string containing your instance ID, such as '12345'
+        
+    * WORLDPAY_TEST_MODE
+        A boolean to determine test mdoe
+
+    * WORLDPAY_MD5_SECRET
+        The string entered in the MD5 field of WorldPay's console, or None
+        
+    * WORLDPAY_SIGNATURE_FIELDS
+        A tuple of field names, such as ('instId', 'cartId', 'amount', 'currency')
+
 
 License
 -------

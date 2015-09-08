@@ -53,7 +53,9 @@ def build_payment_url(order_number, user, basket, shipping_method, shipping_addr
         worldpay_params[b'email'] = user.email
     except AttributeError:
         worldpay_params[b'email'] = json.loads(M_params[b'order_kwargs'])["guest_email"]
-    return gateway.build_payment_url(instance_id, cart_id, total, currency, worldpay_params=worldpay_params, M_params=M_params, secret=settings.SECRET_KEY.encode("utf-8"), test_mode=test_mode)
+    
+    
+    return gateway.build_payment_url(instance_id, cart_id, total, currency, worldpay_params=worldpay_params, M_params=M_params, secret=settings.SECRET_KEY.encode("utf-8"), SignatureFields=settings.WORLDPAY_SIGNATURE_FIELDS, MD5Secret=settings.WORLDPAY_MD5_SECRET.encode("utf-8"), test_mode=test_mode)
 
 def confirm(request):
     if not check_ip(request):
