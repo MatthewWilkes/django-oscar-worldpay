@@ -4,7 +4,7 @@ Worldpay package for django-oscar
 
 .. image:: https://travis-ci.org/MatthewWilkes/django-oscar-worldpay.png
     :alt: Continuous integration status
-    :target: http://travis-ci.org/#!/matthewwilkes/django-oscar-worldpay
+    :target: http://travis-ci.org/#!/MatthewWilkes/django-oscar-worldpay
 
 .. image:: https://coveralls.io/repos/MatthewWilkes/django-oscar-worldpay/badge.svg?branch=master&service=github
     :target: https://coveralls.io/github/MatthewWilkes/django-oscar-worldpay?branch=master
@@ -56,7 +56,7 @@ Having problems or got a question?
 .. _`@django_oscar`: https://twitter.com/django_oscar
 .. _`@matthewwilkes`: https://twitter.com/matthewwilkes
 .. _`django-oscar@googlegroups.com`: https://groups.google.com/forum/?fromgroups#!forum/django-oscar
-.. _`Github`: http://github.com/matthewwilkes/django-oscar-worldpay
+.. _`Github`: http://github.com/MatthewWilkes/django-oscar-worldpay
 
 Changelog
 ---------
