@@ -6,7 +6,6 @@ python:
 env:
     matrix:
         # Django 1.6
-        - COMBO="Django==1.6.8 django-oscar==0.7.2"
         - COMBO="Django==1.6.8 South==1.0.1 django-oscar==1.0"
         # Django 1.7
         - COMBO="Django==1.7.1 django-oscar==1.0"
