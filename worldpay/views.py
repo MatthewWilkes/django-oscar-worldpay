@@ -16,7 +16,7 @@ from oscar.core.loading import get_class, get_model
 from oscar.apps.payment.exceptions import RedirectRequired
 from oscar.apps.payment.exceptions import PaymentError
 
-from facade import build_payment_url, confirm
+from .facade import build_payment_url, confirm
 
 # Load views dynamically
 OscarPaymentDetailsView = get_class('checkout.views', 'PaymentDetailsView')
@@ -150,7 +150,7 @@ class PaymentDetailsView(OscarPaymentDetailsView):
         shipping_address = data['shipping_address']
         billing_address = data['billing_address']
         
-        M_params = {'order_kwargs': json.dumps(data['order_kwargs'])}
+        M_params = {b'order_kwargs': json.dumps(data['order_kwargs'])}
         
         url = build_payment_url(order_number, data['user'], data['basket'], shipping_method, shipping_address, billing_address, M_params=M_params, test_mode=settings.WORLDPAY_TEST_MODE)
         

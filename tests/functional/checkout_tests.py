@@ -66,6 +66,7 @@ class TestPlacingOrder(CheckoutMixin, WebTestCase):
             'cartId':               data['cartId'][0],
             'amount':               data['amount'][0],
             'currency':             data['currency'][0],
+            'transId':              '012345',
             'transStatus':          'Y',
             'M_user':               data['M_user'][0],
             'M_basket':             data['M_basket'][0],

@@ -19,15 +19,18 @@ def build_payment_url(instance_id, cart_id, total, currency, worldpay_params=Non
         ('desc',        ''),
     )
     if M_params is not None:
-        M_params = sorted((b"M_%s" % key, b'%s' % value) for (key, value) in M_params.items())
+        M_params = sorted((b"M_" + key, value) for (key, value) in M_params.items())
         data += tuple(M_params)
         if secret is not None:
             # Generate a HMAC to verify our data is untouched
+            if not isinstance(secret, binary_type):
+                raise ValueError("Secret must be a bytes object")
             auth = hmac.new(secret, digestmod=hashlib.sha256)
             auth.update(binary_type(cart_id))
             auth.update(binary_type(total))
             auth.update(binary_type(currency))
-            auth.update(urlencode(M_params))
+            params = urlencode(M_params)
+            auth.update(params.encode("utf-8"))
             data += (b'M_authenticator', auth.hexdigest()), 
         
     if worldpay_params is not None:

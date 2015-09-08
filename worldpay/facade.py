@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 import json
 
 from django.conf import settings
@@ -8,9 +9,9 @@ from . import gateway
 
 
 def build_payment_url(order_number, user, basket, shipping_method, shipping_address, billing_address, M_params=None, test_mode=False):
-    cart_id = order_number
-    total = basket.total_incl_tax
-    currency = basket.currency
+    cart_id = "{0}".format(order_number).encode("ascii")
+    total = basket.total_incl_tax.to_eng_string().encode("ascii")
+    currency = basket.currency.encode("ascii")
     try:
         user_id = user.pk
     except AttributeError:
@@ -27,32 +28,32 @@ def build_payment_url(order_number, user, basket, shipping_method, shipping_addr
         address = shipping_address
     
     M_params.update({
-        'user': user_id,
-        'basket': basket_id,
-        'shipping_method': shipping_method.code,
-        'shipping_address': shipping_address.pk,
-        'billing_address': getattr(billing_address, 'pk', None),
+        b'user': "{0}".format(user_id).encode("ascii"),
+        b'basket': "{0}".format(basket_id).encode("ascii"),
+        b'shipping_method': "{0}".format(shipping_method.code).encode("ascii"),
+        b'shipping_address': "{0}".format(shipping_address.pk).encode("ascii"),
+        b'billing_address': "{0}".format(getattr(billing_address, 'pk', None)).encode("ascii"),
     })
     
     worldpay_params = {
-        'fixContact': True,
-        'hideContact': False,
+        b'fixContact': True,
+        b'hideContact': False,
         
-        'name':     address.name,
-        'address1': address.line1,
-        'address2': address.line2,
-        'address3': address.line3,
-        'town':     address.city,
-        'region':   address.state,
-        'postcode': address.postcode,
-        'tel':      address.phone_number,
-        'country':  address.country.code
+        b'name':     address.name,
+        b'address1': address.line1,
+        b'address2': address.line2,
+        b'address3': address.line3,
+        b'town':     address.city,
+        b'region':   address.state,
+        b'postcode': address.postcode,
+        b'tel':      address.phone_number,
+        b'country':  address.country.code
     }
     try:
-        worldpay_params['email'] = user.email
+        worldpay_params[b'email'] = user.email
     except AttributeError:
-        worldpay_params['email'] = json.loads(M_params['order_kwargs'])["guest_email"]
-    return gateway.build_payment_url(instance_id, cart_id, total, currency, worldpay_params=worldpay_params, M_params=M_params, secret=settings.SECRET_KEY, test_mode=test_mode)
+        worldpay_params[b'email'] = json.loads(M_params[b'order_kwargs'])["guest_email"]
+    return gateway.build_payment_url(instance_id, cart_id, total, currency, worldpay_params=worldpay_params, M_params=M_params, secret=settings.SECRET_KEY.encode("utf-8"), test_mode=test_mode)
 
 def confirm(request):
     if not check_ip(request):
