@@ -8,6 +8,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, HttpResponse
+from django.template.response import TemplateResponse
 from django.views.generic import View
 from oscar.apps.payment.exceptions import UnableToTakePayment
 from oscar.apps.checkout.views import OrderPlacementMixin
@@ -76,10 +77,7 @@ class CallbackResponseView(OrderPlacementMixin, View):
         except PaymentError as e:
             messages.error(self.request, str(e))
             #self.restore_frozen_basket()
-            return HttpResponse("""
-<WPDISPLAY ITEM=banner>
-<meta http-equiv="refresh" content="3; url=%s">
-""" % self.request.build_absolute_uri(reverse("worldpay-fail")))
+            return TemplateResponse(request, 'worldpay/worldpay_response.html', {'url': self.request.build_absolute_uri(reverse("worldpay-fail"))})
 
         basket = Basket.objects.get(pk=data['M_basket'])
         basket.strategy = Selector().strategy()
@@ -125,10 +123,7 @@ class CallbackResponseView(OrderPlacementMixin, View):
             calc_total,
             **order_kwargs
         )
-        return HttpResponse("""
-<WPDISPLAY ITEM=banner>
-<meta http-equiv="refresh" content="3; url=%s">
-""" % self.request.build_absolute_uri(reverse("worldpay-success")))
+        return TemplateResponse(request, 'worldpay/worldpay_response.html', {'url': self.request.build_absolute_uri(reverse("worldpay-success"))})
         
     
 
