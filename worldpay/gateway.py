@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 import hashlib
 import hmac
+import logging
 import socket
 try:
     from urllib import urlencode
@@ -8,6 +9,8 @@ except ImportError:
     from urllib.parse import urlencode
 
 from six import binary_type
+
+logger = logging.getLogger("worldpay")
 
 
 def build_payment_url(instance_id, cart_id, total, currency, worldpay_params=None, M_params=None, secret=None, SignatureFields=None, MD5Secret=None, test_mode=False):
@@ -52,10 +55,28 @@ def build_payment_url(instance_id, cart_id, total, currency, worldpay_params=Non
     return base + urlencode(data)
 
 
-def confirm(request):
+def confirm(request, secret=None):
     if request.POST['transStatus'] != 'Y':
-        raise ValueError()
-    return request.POST
+        raise ValueError("Transaction not authorised")
+    passed_data = dict(request.POST.items())
+    
+    M_params = sorted((key, value) for (key, value) in passed_data.items() if key.startswith("M_") and key != 'M_authenticator')
+    if secret is not None:
+        # Generate a HMAC to verify our data is untouched
+        if not isinstance(secret, binary_type):
+            raise ValueError("Secret must be a bytes object")
+        auth = hmac.new(secret, digestmod=hashlib.sha256)
+        auth.update(binary_type(passed_data['cartId'].encode("utf-8")))
+        auth.update(binary_type(passed_data['amount'].encode("utf-8")))
+        auth.update(binary_type(passed_data['currency'].encode("utf-8")))
+        params = urlencode(M_params)
+        auth.update(params.encode("utf-8"))
+        authenticator = auth.hexdigest()
+        if authenticator != passed_data['M_authenticator']:
+            logger.warn("Got incorrect authenticator. Expected %s, got %s." % (authenticator, passed_data['M_authenticator']))
+            raise ValueError("Transaction details have been tampered with. Aborting.")
+    
+    return passed_data
 
 def check_ip(ip):
     """Check if an IP address has a reverse DNS that matches worldpay.com, and if

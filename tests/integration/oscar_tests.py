@@ -67,11 +67,13 @@ class TestConfirmOrder(TestCase):
     
     def test_POST_from_8_8_8_8_is_rejected(self):
         data = {
+            'instId':       '100',
             'cartId':       '10001',
-            'cost':         '12.50',
+            'amount':       '12.50',
             'currency':     'GBP',
             'testMode':     0,
             'transStatus':  'Y',
+            'M_authenticator': 'f2b4597421c94db367d412c8af2be71631b1c90323cbae297511ec33c0f16e06',
         }
         
         post_request = RequestFactory().post('/callback/1', data, REMOTE_ADDR='8.8.8.8')
@@ -81,11 +83,13 @@ class TestConfirmOrder(TestCase):
     def test_POST_from_127_0_0_2_is_allowed(self):
         """ We've faked the IP checking to only accept posts from localhost. POSTing from there will not raise an error."""
         data = {
+            'instId':       '100',
             'cartId':       '10001',
-            'cost':         '12.50',
+            'amount':       '12.50',
             'currency':     'GBP',
             'testMode':     0,
             'transStatus':  'Y',
+            'M_authenticator': 'f2b4597421c94db367d412c8af2be71631b1c90323cbae297511ec33c0f16e06',
         }
         
         post_request = RequestFactory().post('/callback/1', data, REMOTE_ADDR='127.0.0.2')
@@ -94,11 +98,13 @@ class TestConfirmOrder(TestCase):
     def test_successful_post_contains_relevant_data(self):
         """ A successful confirmation should return information to finalise the order with. """
         data = {
+            'instId':       '100',
             'cartId':       '10001',
             'amount':       '12.50',
             'currency':     'GBP',
             'testMode':     0,
             'transStatus':  'Y',
+            'M_authenticator': 'f2b4597421c94db367d412c8af2be71631b1c90323cbae297511ec33c0f16e06',
         }
         
         post_request = RequestFactory().post('/callback/1', data, REMOTE_ADDR='127.0.0.2')
@@ -107,20 +113,54 @@ class TestConfirmOrder(TestCase):
         self.assertEqual(result['cartId'], '10001')
         
 
-    def test_M_data_is_passed_through(self):
+    def test_M_data_is_passed_through_with_valid_checksum(self):
         """ A successful confirmation should return the M_data fields we passed in. """
         data = {
+            'instId':       '100',
             'cartId':       '10001',
             'amount':       '12.50',
             'currency':     'GBP',
             'testMode':     0,
             'transStatus':  'Y',
-            'M_foo':        'bar'
+            'M_foo':        'bar',
+            'M_authenticator': '1ebd751273b8748cdaa0b073c30afcd8e959ee7db0600faa1387814d0aa8cc3b',
         }
         
         post_request = RequestFactory().post('/callback/1', data, REMOTE_ADDR='127.0.0.2')
         result = self.confirm(post_request)
         self.assertEqual(result['M_foo'], 'bar')
+
+    def test_failure_occurs_with_invalid_checksum(self):
+        """ If we don't provide a valid checksum the request fails """
+        data = {
+            'instId':       '100',
+            'cartId':       '10001',
+            'amount':       '12.50',
+            'currency':     'GBP',
+            'testMode':     0,
+            'transStatus':  'Y',
+            'M_authenticator': 'FFFF'
+        }
+        
+        post_request = RequestFactory().post('/callback/1', data, REMOTE_ADDR='127.0.0.2')
+        with self.assertRaises(PaymentError):
+            result = self.confirm(post_request)
+        
+    def test_failure_occurs_with_failed_status(self):
+        """ If the transaction wasn't authorised the request fails """
+        data = {
+            'instId':       '100',
+            'cartId':       '10001',
+            'amount':       '12.50',
+            'currency':     'GBP',
+            'testMode':     0,
+            'transStatus':  'F',
+            'M_authenticator': 'f2b4597421c94db367d412c8af2be71631b1c90323cbae297511ec33c0f16e06',
+        }
+        
+        post_request = RequestFactory().post('/callback/1', data, REMOTE_ADDR='127.0.0.2')
+        with self.assertRaises(PaymentError):
+            result = self.confirm(post_request)
         
     
 class TestValidateIp(TestCase):
