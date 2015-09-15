@@ -147,7 +147,7 @@ class PaymentDetailsView(OscarPaymentDetailsView):
         
         M_params = {b'order_kwargs': json.dumps(data['order_kwargs'])}
         
-        url = build_payment_url(order_number, data['user'], data['basket'], shipping_method, shipping_address, billing_address, M_params=M_params, test_mode=settings.WORLDPAY_TEST_MODE)
+        url = build_payment_url(total, order_number, data['user'], data['basket'], shipping_method, shipping_address, billing_address, M_params=M_params, test_mode=settings.WORLDPAY_TEST_MODE)
         
         callback_url = self.request.build_absolute_uri(reverse('worldpay-callback'))
         url += '&MC_Callback=' + callback_url

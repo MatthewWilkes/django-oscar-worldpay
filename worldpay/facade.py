@@ -8,9 +8,12 @@ from oscar.apps.payment.exceptions import PaymentError
 from . import gateway
 
 
-def build_payment_url(order_number, user, basket, shipping_method, shipping_address, billing_address, M_params=None, test_mode=False):
+def build_payment_url(total, order_number, user, basket, shipping_method, shipping_address, billing_address, M_params=None, test_mode=False):
     cart_id = "{0}".format(order_number).encode("ascii")
-    total = basket.total_incl_tax.to_eng_string().encode("ascii")
+    if total is None:
+        total = basket.total_incl_tax.to_eng_string().encode('ascii')
+    else:
+        total = total.incl_tax.to_eng_string().encode('ascii')
     currency = basket.currency.encode("ascii")
     try:
         user_id = user.pk
