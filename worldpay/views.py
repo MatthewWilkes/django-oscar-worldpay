@@ -99,6 +99,7 @@ class CallbackResponseView(OrderPlacementMixin, View):
                         amount_debited=total,
                         reference=data['transId'])
         self.add_payment_source(source)
+        self.add_payment_event('paid', total, reference=data['transId'])
         
         shipping_address = ShippingAddress.objects.get(pk=data['M_shipping_address'])
         if data['M_billing_address'] == 'None':
