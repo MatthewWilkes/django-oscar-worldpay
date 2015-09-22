@@ -15,23 +15,26 @@ logger = logging.getLogger("worldpay")
 
 def build_payment_url(instance_id, cart_id, total, currency, worldpay_params=None, M_params=None, secret=None, SignatureFields=None, MD5Secret=None, test_mode=False):
     data = (
-        ('instId',      instance_id),
-        ('cartId',      cart_id),
-        ('currency',    currency),
-        ('amount',      total),
-        ('desc',        ''),
+        (b'instId',      instance_id.decode("ascii")),
+        (b'cartId',      cart_id.decode("ascii")),
+        (b'currency',    currency.decode("ascii")),
+        (b'amount',      total.decode("ascii")),
+        (b'desc',        ''),
     )
     if M_params is not None:
         M_params = sorted((b"M_" + key, value) for (key, value) in M_params.items())
-        data += tuple(M_params)
+        try:
+            data += tuple((k, v.decode("utf-8")) for (k, v) in M_params)
+        except:
+            import pdb; pdb.set_trace( )
         if secret is not None:
             # Generate a HMAC to verify our data is untouched
             if not isinstance(secret, binary_type):
                 raise ValueError("Secret must be a bytes object")
             auth = hmac.new(secret, digestmod=hashlib.sha256)
-            auth.update(binary_type(cart_id))
-            auth.update(binary_type(total))
-            auth.update(binary_type(currency))
+            auth.update(cart_id)
+            auth.update(total)
+            auth.update(currency)
             params = urlencode(M_params)
             auth.update(params.encode("utf-8"))
             data += (b'M_authenticator', auth.hexdigest()), 
@@ -42,17 +45,19 @@ def build_payment_url(instance_id, cart_id, total, currency, worldpay_params=Non
     
     if SignatureFields is not None and MD5Secret is not None:
         # Add an MD5 hash of the fields specified as a signature
-        values = (MD5Secret,) + tuple(map(dict(data).get, SignatureFields))
+        values = (MD5Secret,) + tuple(map(lambda x:dict(data).get(x).encode('utf-8'), SignatureFields))
         to_hash = b":".join(values)
-        data += ('signature', hashlib.md5(to_hash).hexdigest()), 
+        data += (b'signature', hashlib.md5(to_hash).hexdigest()),
     
     if test_mode:
-        data += ('testMode', 100),
+        data += (b'testMode', '100'),
         base = "https://secure-test.worldpay.com/wcc/purchase?"
     else:
         base = "https://secure.worldpay.com/wcc/purchase?"
-    
-    return base + urlencode(data)
+    try:
+        return base + urlencode([(k,v.encode("utf-8")) for (k,v) in data])
+    except:
+        import pdb; pdb.set_trace( )
 
 
 def confirm(request, secret=None):

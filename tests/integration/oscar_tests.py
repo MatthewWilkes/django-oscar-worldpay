@@ -45,12 +45,12 @@ class TestUrlsFromOrder(TestCase):
     def test_simple_payment_url_is_as_expected(self):
         url = self.build_payment_url(None, self.order.number, self.order.user, self.basket, shipping_methods.Free(), self.address, None)
         self.assertNotIn('testMode', url)
-        self.assertEqual('https://secure.worldpay.com/wcc/purchase?instId=12345&cartId=10001&currency=GBP&amount=10.58&desc=&M_basket=1&M_billing_address=None&M_shipping_address=1&M_shipping_method=free-shipping&M_user=1&M_authenticator=77cfb68a1b094c753709ec5ab0be6b37133aaa998d31f40139c1229f21f6468f&address1=75+Smith+Road&address2=&address3=&country=GB&email=test%40example.com&fixContact=True&hideContact=False&name=Barrington&postcode=N4+8TY&region=&tel=None&town=&signature=ffbf1d6b60214aa1799e4015d5376562', url)
+        self.assertEqual('https://secure.worldpay.com/wcc/purchase?instId=12345&cartId=10001&currency=GBP&amount=10.58&desc=&M_basket=1&M_billing_address=None&M_shipping_address=1&M_shipping_method=free-shipping&M_user=1&M_authenticator=77cfb68a1b094c753709ec5ab0be6b37133aaa998d31f40139c1229f21f6468f&address1=75+Smith+Road&address2=&address3=&country=GB&email=test%40example.com&fixContact=True&hideContact=False&name=Barrington&postcode=N4+8TY&region=&tel=&town=&signature=ffbf1d6b60214aa1799e4015d5376562', url)
 
     def test_test_mode_is_opt_in(self):
         url = self.build_payment_url(None, self.order.number, self.order.user, self.basket, shipping_methods.Free(), self.address, None, test_mode=True)
         self.assertIn('testMode', url)
-        self.assertEqual('https://secure-test.worldpay.com/wcc/purchase?instId=12345&cartId=10001&currency=GBP&amount=10.58&desc=&M_basket=1&M_billing_address=None&M_shipping_address=1&M_shipping_method=free-shipping&M_user=1&M_authenticator=77cfb68a1b094c753709ec5ab0be6b37133aaa998d31f40139c1229f21f6468f&address1=75+Smith+Road&address2=&address3=&country=GB&email=test%40example.com&fixContact=True&hideContact=False&name=Barrington&postcode=N4+8TY&region=&tel=None&town=&signature=ffbf1d6b60214aa1799e4015d5376562&testMode=100', url)
+        self.assertEqual('https://secure-test.worldpay.com/wcc/purchase?instId=12345&cartId=10001&currency=GBP&amount=10.58&desc=&M_basket=1&M_billing_address=None&M_shipping_address=1&M_shipping_method=free-shipping&M_user=1&M_authenticator=77cfb68a1b094c753709ec5ab0be6b37133aaa998d31f40139c1229f21f6468f&address1=75+Smith+Road&address2=&address3=&country=GB&email=test%40example.com&fixContact=True&hideContact=False&name=Barrington&postcode=N4+8TY&region=&tel=&town=&signature=ffbf1d6b60214aa1799e4015d5376562&testMode=100', url)
     
 
 class TestConfirmOrder(TestCase):
@@ -71,7 +71,7 @@ class TestConfirmOrder(TestCase):
             'cartId':       '10001',
             'amount':       '12.50',
             'currency':     'GBP',
-            'testMode':     0,
+            'testMode':     '0',
             'transStatus':  'Y',
             'M_authenticator': 'f2b4597421c94db367d412c8af2be71631b1c90323cbae297511ec33c0f16e06',
         }
@@ -87,7 +87,7 @@ class TestConfirmOrder(TestCase):
             'cartId':       '10001',
             'amount':       '12.50',
             'currency':     'GBP',
-            'testMode':     0,
+            'testMode':     '0',
             'transStatus':  'Y',
             'M_authenticator': 'f2b4597421c94db367d412c8af2be71631b1c90323cbae297511ec33c0f16e06',
         }
@@ -102,7 +102,7 @@ class TestConfirmOrder(TestCase):
             'cartId':       '10001',
             'amount':       '12.50',
             'currency':     'GBP',
-            'testMode':     0,
+            'testMode':     '0',
             'transStatus':  'Y',
             'M_authenticator': 'f2b4597421c94db367d412c8af2be71631b1c90323cbae297511ec33c0f16e06',
         }
@@ -120,7 +120,7 @@ class TestConfirmOrder(TestCase):
             'cartId':       '10001',
             'amount':       '12.50',
             'currency':     'GBP',
-            'testMode':     0,
+            'testMode':     '0',
             'transStatus':  'Y',
             'M_foo':        'bar',
             'M_authenticator': '1ebd751273b8748cdaa0b073c30afcd8e959ee7db0600faa1387814d0aa8cc3b',
@@ -137,7 +137,7 @@ class TestConfirmOrder(TestCase):
             'cartId':       '10001',
             'amount':       '12.50',
             'currency':     'GBP',
-            'testMode':     0,
+            'testMode':     '0',
             'transStatus':  'Y',
             'M_authenticator': 'FFFF'
         }
@@ -153,7 +153,7 @@ class TestConfirmOrder(TestCase):
             'cartId':       '10001',
             'amount':       '12.50',
             'currency':     'GBP',
-            'testMode':     0,
+            'testMode':     '0',
             'transStatus':  'F',
             'M_authenticator': 'f2b4597421c94db367d412c8af2be71631b1c90323cbae297511ec33c0f16e06',
         }

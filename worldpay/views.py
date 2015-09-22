@@ -146,7 +146,7 @@ class PaymentDetailsView(OscarPaymentDetailsView):
         shipping_address = data['shipping_address']
         billing_address = data['billing_address']
         
-        M_params = {b'order_kwargs': json.dumps(data['order_kwargs'])}
+        M_params = {b'order_kwargs': json.dumps(data['order_kwargs']).encode("utf-8")}
         
         url = build_payment_url(total, order_number, data['user'], data['basket'], shipping_method, shipping_address, billing_address, M_params=M_params, test_mode=settings.WORLDPAY_TEST_MODE)
         

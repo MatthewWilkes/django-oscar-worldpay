@@ -1,3 +1,4 @@
+# coding: utf-8
 import sys
 try:
     from urlparse import parse_qs
@@ -39,8 +40,7 @@ def reload_url_conf():
     import_module(settings.ROOT_URLCONF)
 
 
-@override_settings(OSCAR_ALLOW_ANON_CHECKOUT=True)
-class TestPlacingOrder(CheckoutMixin, WebTestCase):
+class OrderTextMixin(object):
     is_anonymous = True
 
     def setUp(self):
@@ -48,7 +48,7 @@ class TestPlacingOrder(CheckoutMixin, WebTestCase):
         from worldpay import facade
         self.check_ip = facade.check_ip
         facade.check_ip = lambda request: True
-        super(TestPlacingOrder, self).setUp()
+        super(OrderTextMixin, self).setUp()
     
     def tearDown(self):
         from worldpay import facade
@@ -80,4 +80,24 @@ class TestPlacingOrder(CheckoutMixin, WebTestCase):
         
         order = Order.objects.all()[0]
         self.assertEqual('hello@egg.com', order.guest_email)
+    
+
+@override_settings(OSCAR_ALLOW_ANON_CHECKOUT=True)
+class TestPlacingOrder(OrderTextMixin, WebTestCase, CheckoutMixin):
+    pass
+
+@override_settings(OSCAR_ALLOW_ANON_CHECKOUT=True)
+class TestPlacingOrderWithForeignAddress(OrderTextMixin, WebTestCase, CheckoutMixin):
+    
+    def enter_shipping_address(self):
+        self.create_shipping_country()
+        address_page = self.get(reverse('checkout:shipping-address'))
+        form = address_page.forms['new_shipping_address']
+        form['first_name'] = u'マツ'
+        form['last_name'] = u'ウリクス'
+        form['line1'] = u'１０２　エリチュヴィネルツススツラス'
+        form['line4'] = u'ベルィヌ'
+        form['postcode'] = 'N12 9RT'
+        form.submit()
+        
     
