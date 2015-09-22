@@ -23,10 +23,7 @@ def build_payment_url(instance_id, cart_id, total, currency, worldpay_params=Non
     )
     if M_params is not None:
         M_params = sorted((b"M_" + key, value) for (key, value) in M_params.items())
-        try:
-            data += tuple((k, v.decode("utf-8")) for (k, v) in M_params)
-        except:
-            import pdb; pdb.set_trace( )
+        data += tuple((k, v.decode("utf-8")) for (k, v) in M_params)
         if secret is not None:
             # Generate a HMAC to verify our data is untouched
             if not isinstance(secret, binary_type):
@@ -54,10 +51,7 @@ def build_payment_url(instance_id, cart_id, total, currency, worldpay_params=Non
         base = "https://secure-test.worldpay.com/wcc/purchase?"
     else:
         base = "https://secure.worldpay.com/wcc/purchase?"
-    try:
-        return base + urlencode([(k,v.encode("utf-8")) for (k,v) in data])
-    except:
-        import pdb; pdb.set_trace( )
+    return base + urlencode([(k,v.encode("utf-8")) for (k,v) in data])
 
 
 def confirm(request, secret=None):
