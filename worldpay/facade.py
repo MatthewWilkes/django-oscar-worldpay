@@ -49,7 +49,7 @@ def build_payment_url(total, order_number, user, basket, shipping_method, shippi
         b'town':     address.city,
         b'region':   address.state,
         b'postcode': address.postcode,
-        b'tel':      address.phone_number or '',
+        b'tel':      address.phone_number.as_international or '',
         b'country':  address.country.code
     }
     try:
