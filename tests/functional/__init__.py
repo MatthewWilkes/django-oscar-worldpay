@@ -58,6 +58,7 @@ class CheckoutMixin(object):
         form['line1'] = '1 Egg Road'
         form['line4'] = 'Shell City'
         form['postcode'] = 'N12 9RT'
+        form['phone_number'] = '01225 442244'
         form.submit()
 
     def enter_shipping_method(self):

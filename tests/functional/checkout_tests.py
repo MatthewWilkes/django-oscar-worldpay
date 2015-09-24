@@ -98,6 +98,7 @@ class TestPlacingOrderWithForeignAddress(OrderTextMixin, WebTestCase, CheckoutMi
         form['line1'] = u'１０２　エリチュヴィネルツススツラス'
         form['line4'] = u'ベルィヌ'
         form['postcode'] = 'N12 9RT'
+        form['phone_number'] = '01225 442244'
         form.submit()
         
     

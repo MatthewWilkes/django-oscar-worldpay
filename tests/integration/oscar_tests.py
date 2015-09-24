@@ -37,7 +37,7 @@ class TestUrlsFromOrder(TestCase):
         country = address_models.Country.objects.create(iso_3166_1_a2='GB', name="Great Britain")
         self.address = order_models.ShippingAddress(
             first_name='', last_name='Barrington', line1="75 Smith Road",
-            postcode="N4 8TY", country=country)
+            postcode="N4 8TY", country=country, phone_number='01225 442244')
     
         from worldpay.facade import build_payment_url
         self.build_payment_url = build_payment_url
@@ -45,12 +45,12 @@ class TestUrlsFromOrder(TestCase):
     def test_simple_payment_url_is_as_expected(self):
         url = self.build_payment_url(None, self.order.number, self.order.user, self.basket, shipping_methods.Free(), self.address, None)
         self.assertNotIn('testMode', url)
-        self.assertEqual('https://secure.worldpay.com/wcc/purchase?instId=12345&cartId=10001&currency=GBP&amount=10.58&desc=&M_basket=1&M_billing_address=None&M_shipping_address=1&M_shipping_method=free-shipping&M_user=1&M_authenticator=77cfb68a1b094c753709ec5ab0be6b37133aaa998d31f40139c1229f21f6468f&address1=75+Smith+Road&address2=&address3=&country=GB&email=test%40example.com&fixContact=True&hideContact=False&name=Barrington&postcode=N4+8TY&region=&tel=&town=&signature=ffbf1d6b60214aa1799e4015d5376562', url)
+        self.assertEqual('https://secure.worldpay.com/wcc/purchase?instId=12345&cartId=10001&currency=GBP&amount=10.58&desc=&M_basket=1&M_billing_address=None&M_shipping_address=1&M_shipping_method=free-shipping&M_user=1&M_authenticator=77cfb68a1b094c753709ec5ab0be6b37133aaa998d31f40139c1229f21f6468f&address1=75+Smith+Road&address2=&address3=&country=GB&email=test%40example.com&fixContact=True&hideContact=False&name=Barrington&postcode=N4+8TY&region=&tel=01225+442244&town=&signature=ffbf1d6b60214aa1799e4015d5376562', url)
 
     def test_test_mode_is_opt_in(self):
         url = self.build_payment_url(None, self.order.number, self.order.user, self.basket, shipping_methods.Free(), self.address, None, test_mode=True)
         self.assertIn('testMode', url)
-        self.assertEqual('https://secure-test.worldpay.com/wcc/purchase?instId=12345&cartId=10001&currency=GBP&amount=10.58&desc=&M_basket=1&M_billing_address=None&M_shipping_address=1&M_shipping_method=free-shipping&M_user=1&M_authenticator=77cfb68a1b094c753709ec5ab0be6b37133aaa998d31f40139c1229f21f6468f&address1=75+Smith+Road&address2=&address3=&country=GB&email=test%40example.com&fixContact=True&hideContact=False&name=Barrington&postcode=N4+8TY&region=&tel=&town=&signature=ffbf1d6b60214aa1799e4015d5376562&testMode=100', url)
+        self.assertEqual('https://secure-test.worldpay.com/wcc/purchase?instId=12345&cartId=10001&currency=GBP&amount=10.58&desc=&M_basket=1&M_billing_address=None&M_shipping_address=1&M_shipping_method=free-shipping&M_user=1&M_authenticator=77cfb68a1b094c753709ec5ab0be6b37133aaa998d31f40139c1229f21f6468f&address1=75+Smith+Road&address2=&address3=&country=GB&email=test%40example.com&fixContact=True&hideContact=False&name=Barrington&postcode=N4+8TY&region=&tel=01225+442244&town=&signature=ffbf1d6b60214aa1799e4015d5376562&testMode=100', url)
     
 
 class TestConfirmOrder(TestCase):
