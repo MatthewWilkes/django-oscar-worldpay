@@ -12,6 +12,11 @@ class TestUrlGeneration(TestCase):
         self.assertNotIn('testMode', url)
         self.assertEqual('https://secure.worldpay.com/wcc/purchase?instId=12345&cartId=6789&currency=GBP&amount=12.00&desc=', url)
 
+    def test_decimals_are_rounded(self):
+        url = build_payment_url(b'12345', b'6789', b'132.0000', b'GBP')
+        self.assertIn('132.00', url)
+        self.assertNotIn('132.0000', url)
+        
     def test_test_mode_is_opt_in(self):
         url = build_payment_url(b'12345', b'6789', b'12.00', b'GBP', test_mode=True)
         self.assertIn('testMode', url)
