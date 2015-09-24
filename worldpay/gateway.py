@@ -16,7 +16,7 @@ logger = logging.getLogger("worldpay")
 
 
 def build_payment_url(instance_id, cart_id, total, currency, worldpay_params=None, M_params=None, secret=None, SignatureFields=None, MD5Secret=None, test_mode=False):
-    sane_total = ("{0:.2f}".format(Decimal(total))).decode("ascii")
+    sane_total = ("{0:.2f}".format(Decimal(total.decode("ascii"))))
     data = (
         (b'instId',      instance_id.decode("ascii")),
         (b'cartId',      cart_id.decode("ascii")),
@@ -33,7 +33,7 @@ def build_payment_url(instance_id, cart_id, total, currency, worldpay_params=Non
                 raise ValueError("Secret must be a bytes object")
             auth = hmac.new(secret, digestmod=hashlib.sha256)
             auth.update(cart_id)
-            auth.update(sane_total)
+            auth.update(sane_total.encode("utf-8"))
             auth.update(currency)
             params = urlencode(M_params)
             auth.update(params.encode("utf-8"))
