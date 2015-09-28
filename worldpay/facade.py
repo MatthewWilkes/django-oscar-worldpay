@@ -38,6 +38,11 @@ def build_payment_url(total, order_number, user, basket, shipping_method, shippi
         b'billing_address': "{0}".format(getattr(billing_address, 'pk', None)).encode("ascii"),
     })
     
+    try:
+        phone_number = address.phone_number.as_international
+    except AttributeError:
+        phone_number = ''
+    
     worldpay_params = {
         b'fixContact': 'True',
         b'hideContact': 'False',
@@ -49,7 +54,7 @@ def build_payment_url(total, order_number, user, basket, shipping_method, shippi
         b'town':     address.city,
         b'region':   address.state,
         b'postcode': address.postcode,
-        b'tel':      address.phone_number.as_international or '',
+        b'tel':      phone_number,
         b'country':  address.country.code
     }
     try:
