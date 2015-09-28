@@ -103,7 +103,8 @@ Changelog
 1.1
 ---
 
-* Nothing yet
+* Fix a bug when phonenumber wasn't set.
+* Remove some old PayPal references that were missed.
 
 1.0
 ---
