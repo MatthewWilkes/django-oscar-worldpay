@@ -100,6 +100,11 @@ Having problems or got a question?
 Changelog
 ---------
 
+1.2
+---
+
+* Nothing yet
+
 1.1
 ---
 
