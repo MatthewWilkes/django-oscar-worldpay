@@ -1,4 +1,5 @@
 # coding: utf-8
+import re
 import sys
 try:
     from urlparse import parse_qs
@@ -32,6 +33,8 @@ try:
 except ImportError:
     pass
 
+REDIRECT_PATH = re.compile(u"url=http://localhost:80(.*)\"")
+
 
 def reload_url_conf():
     # Reload URLs to pick up the overridden settings
@@ -54,7 +57,7 @@ class OrderTextMixin(object):
         from worldpay import facade
         facade.check_ip = self.check_ip
     
-    def test_saves_guest_email_with_order(self):
+    def test_saves_order(self):
         preview = self.ready_to_place_an_order(is_guest=True)
         worldpay = preview.forms['place_order_form'].submit()
         
@@ -80,11 +83,52 @@ class OrderTextMixin(object):
         
         order = Order.objects.all()[0]
         self.assertEqual('hello@egg.com', order.guest_email)
+        
+        preview = self.app.get(REDIRECT_PATH.findall(callback.body.decode("utf-8"))[0]).maybe_follow()
+        self.assertIn('Your order has been placed and a confirmation email has been sent', preview)
+        self.assertIn('reference: 012345', preview)
     
 
 @override_settings(OSCAR_ALLOW_ANON_CHECKOUT=True)
 class TestPlacingOrder(OrderTextMixin, WebTestCase, CheckoutMixin):
     pass
+
+
+@override_settings(OSCAR_ALLOW_ANON_CHECKOUT=True)
+class TestPlacingOrderWithRejectedCardFails(OrderTextMixin, WebTestCase, CheckoutMixin):
+
+    def test_saves_order(self):
+        """returns user to preview page"""
+        preview = self.ready_to_place_an_order(is_guest=True)
+        worldpay = preview.forms['place_order_form'].submit()
+        
+        redirect = worldpay.location
+        data = parse_qs(worldpay.location.split("?")[1])
+        
+        worldpay_agent = self.app_class(extra_environ=self.extra_environ)
+        callback = worldpay_agent.post(reverse('worldpay-callback'), {
+            'cartId':               data['cartId'][0],
+            'amount':               data['amount'][0],
+            'currency':             data['currency'][0],
+            'transId':              '012345',
+            'transStatus':          'N',
+            'M_user':               data['M_user'][0],
+            'M_basket':             data['M_basket'][0],
+            'M_authenticator':      data['M_authenticator'][0],
+            'M_shipping_method':    data['M_shipping_method'][0],
+            'M_shipping_address':   data['M_shipping_address'][0],
+            'M_billing_address':    data['M_billing_address'][0],
+            'M_order_kwargs':       data['M_order_kwargs'][0],
+            'testMode':             '100',
+        })
+        
+        self.assertEqual(Order.objects.count(), 0)
+        checkout = self.app.get(REDIRECT_PATH.findall(callback.body.decode("utf-8"))[0]).maybe_follow()
+        self.assertIn('On the next page you will be prompted for payment details', checkout)
+        self.assertIn('Transaction not authorised', checkout)
+        self.assertNotIn('Your order has been placed and a confirmation email has been sent', checkout)
+        self.assertNotIn('reference: 012345', checkout)
+    
 
 @override_settings(OSCAR_ALLOW_ANON_CHECKOUT=True)
 class TestPlacingOrderWithForeignAddress(OrderTextMixin, WebTestCase, CheckoutMixin):

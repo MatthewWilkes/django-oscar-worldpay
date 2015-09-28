@@ -63,6 +63,8 @@ class FailView(OrderPlacementMixin, View):
     
     def get(self, request, *args, **kwargs):
         # Flush all session data
+        if 'error' in request.GET:
+            messages.error(self.request, request.GET['error'])
         self.restore_frozen_basket()
         return HttpResponseRedirect(reverse('checkout:preview'))
     
@@ -75,9 +77,9 @@ class CallbackResponseView(OrderPlacementMixin, View):
         try:
             data = confirm(request)
         except PaymentError as e:
-            messages.error(self.request, str(e))
+            #messages.error(self.request, str(e))
             #self.restore_frozen_basket()
-            return TemplateResponse(request, 'worldpay/worldpay_response.html', {'url': self.request.build_absolute_uri(reverse("worldpay-fail"))})
+            return TemplateResponse(request, 'worldpay/worldpay_response.html', {'url': self.request.build_absolute_uri(reverse("worldpay-fail") + "?error=%s" % str(e))})
 
         basket = Basket.objects.get(pk=data['M_basket'])
         basket.strategy = Selector().strategy()
