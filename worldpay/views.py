@@ -11,7 +11,6 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.template.response import TemplateResponse
 from django.views.generic import View
 from oscar.apps.payment.exceptions import UnableToTakePayment
-from oscar.apps.checkout.views import OrderPlacementMixin
 from oscar.core.loading import get_class, get_model
 
 from oscar.apps.payment.exceptions import RedirectRequired
@@ -22,6 +21,7 @@ from .facade import build_payment_url, confirm
 # Load views dynamically
 OscarPaymentDetailsView = get_class('checkout.views', 'PaymentDetailsView')
 CheckoutSessionMixin = get_class('checkout.session', 'CheckoutSessionMixin')
+OrderPlacementMixin = get_class('checkout.mixins', 'OrderPlacementMixin')
 
 BillingAddress = get_model('order', 'BillingAddress')
 ShippingAddress = get_model('order', 'ShippingAddress')
