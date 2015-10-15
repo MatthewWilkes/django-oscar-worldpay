@@ -121,13 +121,13 @@ class TestPlacingOrderWithRejectedCardFails(OrderTextMixin, WebTestCase, Checkou
             'M_order_kwargs':       data['M_order_kwargs'][0],
             'testMode':             '100',
         })
-        
+
         self.assertEqual(Order.objects.count(), 0)
-        checkout = self.app.get(REDIRECT_PATH.findall(callback.body.decode("utf-8"))[0]).maybe_follow()
-        self.assertIn('On the next page you will be prompted for payment details', checkout)
-        self.assertIn('Transaction not authorised', checkout)
-        self.assertNotIn('Your order has been placed and a confirmation email has been sent', checkout)
-        self.assertNotIn('reference: 012345', checkout)
+        basket = self.app.get(REDIRECT_PATH.findall(callback.body.decode("utf-8"))[0]).maybe_follow()
+        self.assertEqual(reverse('basket:summary'), basket.request.path)
+        self.assertIn('Transaction not authorised', basket)
+        self.assertNotIn('Your order has been placed and a confirmation email has been sent', basket)
+        self.assertNotIn('reference: 012345', basket)
     
 
 @override_settings(OSCAR_ALLOW_ANON_CHECKOUT=True)
