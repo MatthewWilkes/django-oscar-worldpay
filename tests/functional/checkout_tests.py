@@ -98,7 +98,7 @@ class TestPlacingOrder(OrderTextMixin, WebTestCase, CheckoutMixin):
 class TestPlacingOrderWithRejectedCardFails(OrderTextMixin, WebTestCase, CheckoutMixin):
 
     def test_saves_order(self):
-        """returns user to preview page"""
+        """returns user to basket summary page"""
         preview = self.ready_to_place_an_order(is_guest=True)
         worldpay = preview.forms['place_order_form'].submit()
         
