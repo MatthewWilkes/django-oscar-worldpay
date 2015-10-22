@@ -11,6 +11,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.template.response import TemplateResponse
 from django.views.generic import View
 from oscar.apps.payment.exceptions import UnableToTakePayment
+#from oscar.apps.checkout.views import OrderPlacementMixin
 from oscar.core.loading import get_class, get_model
 
 from oscar.apps.payment.exceptions import RedirectRequired
@@ -43,6 +44,10 @@ class SuccessView(OrderPlacementMixin, View):
     """
     
     def get(self, request, *args, **kwargs):
+        if self.request.session.has_key('checkout_order_id') and self.request.session['checkout_order_id']:
+            # If we've already completed a checkout session, just redirect to confirmation.
+            return HttpResponseRedirect(self.get_success_url())
+
         order_number = self.checkout_session.get_order_number()
         # Flush all session data
         self.checkout_session.flush()
@@ -152,6 +157,10 @@ class PaymentDetailsView(OscarPaymentDetailsView):
         
         url = build_payment_url(total, order_number, data['user'], data['basket'], shipping_method, shipping_address, billing_address, M_params=M_params, test_mode=settings.WORLDPAY_TEST_MODE)
         
+        if self.request.session.has_key('checkout_order_id'):
+            # We're about to start a new payment, clear any previous checkout id
+            self.request.session['checkout_order_id'] = None
+
         callback_url = self.request.build_absolute_uri(reverse('worldpay-callback'))
         url += '&MC_Callback=' + callback_url
         raise RedirectRequired(url)
