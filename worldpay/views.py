@@ -66,7 +66,7 @@ class FailView(OrderPlacementMixin, View):
         if 'error' in request.GET:
             messages.error(self.request, request.GET['error'])
         self.restore_frozen_basket()
-        return HttpResponseRedirect(reverse('checkout:preview'))
+        return HttpResponseRedirect(reverse('basket:summary'))
     
 
 class CallbackResponseView(OrderPlacementMixin, View):
