@@ -50,7 +50,8 @@ class CheckoutMixin(object):
             iso_3166_1_a2='GB', is_shipping_country=True)
 
     def enter_shipping_address(self):
-        self.create_shipping_country()
+        if not Country.objects.count():
+            self.create_shipping_country()
         address_page = self.get(reverse('checkout:shipping-address'))
         form = address_page.forms['new_shipping_address']
         form['first_name'] = 'John'
