@@ -100,7 +100,7 @@ Having problems or got a question?
 Changelog
 ---------
 
-1.2 (Unreleased)
+1.2 (2015-10-22)
 ----------------
 
 * Make order confirmation more reliable, by fixing a failure mode if the user sends multiple finalisation requests
