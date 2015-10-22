@@ -100,6 +100,11 @@ Having problems or got a question?
 Changelog
 ---------
 
+1.3 (Unreleased)
+----------------
+
+* Nothing yet
+
 1.2 (2015-10-22)
 ----------------
 
