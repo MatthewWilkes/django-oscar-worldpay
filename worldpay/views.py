@@ -88,6 +88,9 @@ class CallbackResponseView(OrderPlacementMixin, View):
         except PaymentError as e:
             #messages.error(self.request, str(e))
             #self.restore_frozen_basket()
+            
+            logger.error(str(e))
+            
             return TemplateResponse(request, 'worldpay/worldpay_response.html', {'url': self.request.build_absolute_uri(reverse("worldpay-fail") + "?error=%s" % str(e))})
 
         basket = Basket.objects.get(pk=data['M_basket'])
