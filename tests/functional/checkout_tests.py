@@ -1,4 +1,5 @@
 # coding: utf-8
+from copy import copy
 import re
 import sys
 try:
@@ -92,7 +93,7 @@ class OrderTextMixin(object):
 @override_settings(OSCAR_ALLOW_ANON_CHECKOUT=True)
 class TestPlacingOrder(OrderTextMixin, WebTestCase, CheckoutMixin):
     
-    def test_reloading_confirmation_email_does_not_duplicate_order_but_still_redirects_to_thanks(self):
+    def test_reloading_confirmation_page_does_not_duplicate_order_but_still_redirects_to_thanks(self):
         preview = self.ready_to_place_an_order(is_guest=True)
         worldpay = preview.forms['place_order_form'].submit()
         
@@ -124,7 +125,42 @@ class TestPlacingOrder(OrderTextMixin, WebTestCase, CheckoutMixin):
         
         self.assertIn('Your order has been placed and a confirmation email has been sent', preview)
         self.assertIn('reference: 012345', preview)
-    
+
+    def test_reloading_confirmation_page_with_race_condition_session_does_not_duplicate_order_but_still_redirects_to_thanks(self):
+        preview = self.ready_to_place_an_order(is_guest=True)
+        worldpay = preview.forms['place_order_form'].submit()
+        
+        redirect = worldpay.location
+        data = parse_qs(worldpay.location.split("?")[1])
+        
+        worldpay_agent = self.app_class(extra_environ=self.extra_environ)
+        callback = worldpay_agent.post(reverse('worldpay-callback'), {
+            'cartId':               data['cartId'][0],
+            'amount':               data['amount'][0],
+            'currency':             data['currency'][0],
+            'transId':              '012345',
+            'transStatus':          'Y',
+            'M_user':               data['M_user'][0],
+            'M_basket':             data['M_basket'][0],
+            'M_authenticator':      data['M_authenticator'][0],
+            'M_shipping_method':    data['M_shipping_method'][0],
+            'M_shipping_address':   data['M_shipping_address'][0],
+            'M_billing_address':    data['M_billing_address'][0],
+            'M_order_kwargs':       data['M_order_kwargs'][0],
+            'testMode':             '100',
+        })
+        
+        order = Order.objects.all()[0]
+        self.assertEqual('hello@egg.com', order.guest_email)
+        
+        # Sometimes a second request will be made before the first finishes
+        preview = self.app.get(REDIRECT_PATH.findall(callback.body.decode("utf-8"))[0]).maybe_follow()
+        self.app.session.flush()
+        preview = self.app.get(REDIRECT_PATH.findall(callback.body.decode("utf-8"))[0]).maybe_follow()
+        
+        self.assertIn('Your order has been placed and a confirmation email has been sent', preview)
+        self.assertIn('reference: 012345', preview)
+        
     def test_placing_multiple_successive_orders_does_not_fail(self):
         preview = self.ready_to_place_an_order(is_guest=True)
         worldpay = preview.forms['place_order_form'].submit()
