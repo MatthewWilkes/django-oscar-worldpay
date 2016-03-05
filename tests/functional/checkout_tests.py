@@ -14,6 +14,7 @@ from django.utils.importlib import import_module
 from oscar.core.compat import get_user_model
 from oscar.core.loading import get_class, get_classes, get_model
 from oscar.test.testcases import WebTestCase
+from oscar.test import factories
 from . import CheckoutMixin
 
 GatewayForm = get_class('checkout.forms', 'GatewayForm')
@@ -124,6 +125,69 @@ class TestPlacingOrder(OrderTextMixin, WebTestCase, CheckoutMixin):
         
         self.assertIn('Your order has been placed and a confirmation email has been sent', preview)
         self.assertIn('reference: 012345', preview)
+    
+    def test_reloading_confirm_redirect_places_order_and_does_not_error(self):
+        preview = self.ready_to_place_an_order(is_guest=True)
+        worldpay = preview.forms['place_order_form'].submit()
+        
+        redirect = worldpay.location
+        data = parse_qs(worldpay.location.split("?")[1])
+        
+        worldpay_agent = self.app_class(extra_environ=self.extra_environ)
+        callback = worldpay_agent.post(reverse('worldpay-callback'), {
+            'cartId':               data['cartId'][0],
+            'amount':               data['amount'][0],
+            'currency':             data['currency'][0],
+            'transId':              '012345',
+            'transStatus':          'Y',
+            'M_user':               data['M_user'][0],
+            'M_basket':             data['M_basket'][0],
+            'M_authenticator':      data['M_authenticator'][0],
+            'M_shipping_method':    data['M_shipping_method'][0],
+            'M_shipping_address':   data['M_shipping_address'][0],
+            'M_billing_address':    data['M_billing_address'][0],
+            'M_order_kwargs':       data['M_order_kwargs'][0],
+            'testMode':             '100',
+        })
+        order = Order.objects.all()[0]
+        self.assertEqual('hello@egg.com', order.guest_email)
+        preview = self.app.get(REDIRECT_PATH.findall(callback.body.decode("utf-8"))[0]).maybe_follow()
+        preview = self.app.get(REDIRECT_PATH.findall(callback.body.decode("utf-8"))[0]).maybe_follow()
+        
+        self.assertIn('Your order has been placed and a confirmation email has been sent', preview)
+        self.assertIn('reference: 012345', preview)
+    
+    def test_order_information_cannot_be_found_by_faking_order_number_in_success_page(self):
+        preview = self.ready_to_place_an_order(is_guest=True)
+        worldpay = preview.forms['place_order_form'].submit()
+        
+        redirect = worldpay.location
+        data = parse_qs(worldpay.location.split("?")[1])
+        
+        worldpay_agent = self.app_class(extra_environ=self.extra_environ)
+        callback = worldpay_agent.post(reverse('worldpay-callback'), {
+            'cartId':               data['cartId'][0],
+            'amount':               data['amount'][0],
+            'currency':             data['currency'][0],
+            'transId':              '012345',
+            'transStatus':          'Y',
+            'M_user':               data['M_user'][0],
+            'M_basket':             data['M_basket'][0],
+            'M_authenticator':      data['M_authenticator'][0],
+            'M_shipping_method':    data['M_shipping_method'][0],
+            'M_shipping_address':   data['M_shipping_address'][0],
+            'M_billing_address':    data['M_billing_address'][0],
+            'M_order_kwargs':       data['M_order_kwargs'][0],
+            'testMode':             '100',
+        })
+        order = Order.objects.all()[0]
+        self.assertEqual('hello@egg.com', order.guest_email)
+        preview_url = REDIRECT_PATH.findall(callback.body.decode("utf-8"))[0]
+        new_order = factories.create_order()
+        fake_preview_url = preview_url.replace(str(order.number), str(new_order.number))
+        preview = self.app.get(fake_preview_url).maybe_follow()
+        
+        self.assertNotIn(str(new_order.number), preview)
     
     def test_placing_multiple_successive_orders_does_not_fail(self):
         preview = self.ready_to_place_an_order(is_guest=True)
