@@ -1,5 +1,4 @@
 # coding: utf-8
-from copy import copy
 import re
 import sys
 try:
@@ -62,7 +61,6 @@ class OrderTextMixin(object):
         preview = self.ready_to_place_an_order(is_guest=True)
         worldpay = preview.forms['place_order_form'].submit()
         
-        redirect = worldpay.location
         data = parse_qs(worldpay.location.split("?")[1])
         
         worldpay_agent = self.app_class(extra_environ=self.extra_environ)
@@ -97,7 +95,6 @@ class TestPlacingOrder(OrderTextMixin, WebTestCase, CheckoutMixin):
         preview = self.ready_to_place_an_order(is_guest=True)
         worldpay = preview.forms['place_order_form'].submit()
         
-        redirect = worldpay.location
         data = parse_qs(worldpay.location.split("?")[1])
         
         worldpay_agent = self.app_class(extra_environ=self.extra_environ)
@@ -130,7 +127,6 @@ class TestPlacingOrder(OrderTextMixin, WebTestCase, CheckoutMixin):
         preview = self.ready_to_place_an_order(is_guest=True)
         worldpay = preview.forms['place_order_form'].submit()
         
-        redirect = worldpay.location
         data = parse_qs(worldpay.location.split("?")[1])
         
         worldpay_agent = self.app_class(extra_environ=self.extra_environ)
@@ -165,7 +161,6 @@ class TestPlacingOrder(OrderTextMixin, WebTestCase, CheckoutMixin):
         preview = self.ready_to_place_an_order(is_guest=True)
         worldpay = preview.forms['place_order_form'].submit()
         
-        redirect = worldpay.location
         data = parse_qs(worldpay.location.split("?")[1])
         
         worldpay_agent = self.app_class(extra_environ=self.extra_environ)
@@ -197,7 +192,6 @@ class TestPlacingOrder(OrderTextMixin, WebTestCase, CheckoutMixin):
         preview = self.ready_to_place_an_order(is_guest=True)
         worldpay = preview.forms['place_order_form'].submit()
         
-        redirect = worldpay.location
         data = parse_qs(worldpay.location.split("?")[1])
         
         worldpay_agent = self.app_class(extra_environ=self.extra_environ)
@@ -233,7 +227,6 @@ class TestPlacingOrderWithRejectedCardFails(OrderTextMixin, WebTestCase, Checkou
         preview = self.ready_to_place_an_order(is_guest=True)
         worldpay = preview.forms['place_order_form'].submit()
         
-        redirect = worldpay.location
         data = parse_qs(worldpay.location.split("?")[1])
         
         worldpay_agent = self.app_class(extra_environ=self.extra_environ)
