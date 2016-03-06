@@ -1,4 +1,5 @@
 # coding: utf-8
+from copy import copy
 import re
 import sys
 try:
@@ -93,7 +94,7 @@ class OrderTextMixin(object):
 @override_settings(OSCAR_ALLOW_ANON_CHECKOUT=True)
 class TestPlacingOrder(OrderTextMixin, WebTestCase, CheckoutMixin):
     
-    def test_reloading_confirmation_email_does_not_duplicate_order_but_still_redirects_to_thanks(self):
+    def test_reloading_confirmation_page_does_not_duplicate_order_but_still_redirects_to_thanks(self):
         preview = self.ready_to_place_an_order(is_guest=True)
         worldpay = preview.forms['place_order_form'].submit()
         
@@ -126,7 +127,7 @@ class TestPlacingOrder(OrderTextMixin, WebTestCase, CheckoutMixin):
         self.assertIn('Your order has been placed and a confirmation email has been sent', preview)
         self.assertIn('reference: 012345', preview)
     
-    def test_reloading_confirm_redirect_places_order_and_does_not_error(self):
+    def test_reloading_confirmation_page_with_race_condition_session_does_not_duplicate_order_but_still_redirects_to_thanks(self):
         preview = self.ready_to_place_an_order(is_guest=True)
         worldpay = preview.forms['place_order_form'].submit()
         
@@ -149,9 +150,13 @@ class TestPlacingOrder(OrderTextMixin, WebTestCase, CheckoutMixin):
             'M_order_kwargs':       data['M_order_kwargs'][0],
             'testMode':             '100',
         })
+        
         order = Order.objects.all()[0]
         self.assertEqual('hello@egg.com', order.guest_email)
+        
+        # Sometimes a second request will be made before the first finishes
         preview = self.app.get(REDIRECT_PATH.findall(callback.body.decode("utf-8"))[0]).maybe_follow()
+        self.app.session.flush()
         preview = self.app.get(REDIRECT_PATH.findall(callback.body.decode("utf-8"))[0]).maybe_follow()
         
         self.assertIn('Your order has been placed and a confirmation email has been sent', preview)
