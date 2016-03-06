@@ -5,6 +5,7 @@ try:
     from urlparse import parse_qs
 except ImportError:
     from urllib.parse import parse_qs
+import unittest
 
 from django.test.utils import override_settings
 from django.core.urlresolvers import reverse
@@ -123,6 +124,7 @@ class TestPlacingOrder(OrderTextMixin, WebTestCase, CheckoutMixin):
         self.assertIn('Your order has been placed and a confirmation email has been sent', preview)
         self.assertIn('reference: 012345', preview)
 
+    @unittest.expectedFailure
     def test_reloading_confirmation_page_with_race_condition_session_does_not_duplicate_order_but_still_redirects_to_thanks(self):
         preview = self.ready_to_place_an_order(is_guest=True)
         worldpay = preview.forms['place_order_form'].submit()
