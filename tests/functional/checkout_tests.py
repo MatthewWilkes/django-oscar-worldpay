@@ -188,8 +188,8 @@ class TestPlacingOrder(OrderTextMixin, WebTestCase, CheckoutMixin):
         preview_url = REDIRECT_PATH.findall(callback.body.decode("utf-8"))[0]
         new_order = factories.create_order()
         fake_preview_url = preview_url.replace(str(order.number), str(new_order.number))
-        preview = self.app.get(fake_preview_url).maybe_follow()
-        
+        preview = self.app.get(fake_preview_url, expect_errors=True)
+        self.assertEqual(preview.status_code, 400)
         self.assertNotIn(str(new_order.number), preview)
     
     def test_placing_multiple_successive_orders_does_not_fail(self):

@@ -7,7 +7,8 @@ from django.contrib.auth.models import User, AnonymousUser
 from django.conf import settings
 from django.contrib import messages
 from django.core.urlresolvers import reverse
-from django.http import HttpResponseRedirect, HttpResponse
+from django.core.signing import BadSignature, TimestampSigner
+from django.http import HttpResponseRedirect, HttpResponseBadRequest
 from django.template.response import TemplateResponse
 from django.views.generic import View
 from oscar.apps.payment.exceptions import UnableToTakePayment
@@ -48,10 +49,13 @@ class SuccessView(OrderPlacementMixin, View):
             # If we've already completed a checkout session, just redirect to confirmation.
             return HttpResponseRedirect(self.get_success_url())
 
-        #order_number = self.checkout_session.get_order_number()
-        
-        order_number = request.GET.get('order_number', '')
-        
+        signer = TimestampSigner()
+        try:
+            order_number = signer.unsign(request.GET.get('order_number', ''), max_age=3600)
+        except BadSignature:
+            # The URL has been tampered with, push out to the success page without
+            # modifying the session context
+            return HttpResponseBadRequest()
         
         # Flush all session data
         self.checkout_session.flush()
@@ -139,6 +143,8 @@ class CallbackResponseView(OrderPlacementMixin, View):
             **order_kwargs
         )
         
+        signer = TimestampSigner()
+        order_number = signer.sign(order_number)
         success_url = self.request.build_absolute_uri(reverse("worldpay-success") + '?order_number=%s' % (order_number))
         
         return TemplateResponse(request, 'worldpay/worldpay_response.html', {'url': success_url })
