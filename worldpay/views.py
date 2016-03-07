@@ -11,8 +11,6 @@ from django.core.signing import BadSignature, TimestampSigner
 from django.http import HttpResponseRedirect, HttpResponseBadRequest
 from django.template.response import TemplateResponse
 from django.views.generic import View
-from oscar.apps.payment.exceptions import UnableToTakePayment
-#from oscar.apps.checkout.views import OrderPlacementMixin
 from oscar.core.loading import get_class, get_model
 
 from oscar.apps.payment.exceptions import RedirectRequired
@@ -90,11 +88,9 @@ class CallbackResponseView(OrderPlacementMixin, View):
         try:
             data = confirm(request)
         except PaymentError as e:
-            #messages.error(self.request, str(e))
-            #self.restore_frozen_basket()
-            
-            logger.error(str(e))
-            
+            messages.error(self.request, str(e))
+            self.restore_frozen_basket()
+            logger.exception(e)
             return TemplateResponse(request, 'worldpay/worldpay_response.html', {'url': self.request.build_absolute_uri(reverse("worldpay-fail") + "?error=%s" % str(e))})
 
         basket = Basket.objects.get(pk=data['M_basket'])
@@ -131,7 +127,7 @@ class CallbackResponseView(OrderPlacementMixin, View):
         order_kwargs = json.loads(data['M_order_kwargs'])
         # Place order
         calc_total = self.get_order_totals(basket, shipping_method.calculate(basket))
-        result = self.handle_order_placement(
+        self.handle_order_placement(
             order_number,
             user,
             basket,
@@ -147,7 +143,7 @@ class CallbackResponseView(OrderPlacementMixin, View):
         order_number = signer.sign(order_number)
         success_url = self.request.build_absolute_uri(reverse("worldpay-success") + '?order_number=%s' % (order_number))
         
-        return TemplateResponse(request, 'worldpay/worldpay_response.html', {'url': success_url })
+        return TemplateResponse(request, 'worldpay/worldpay_response.html', {'url': success_url})
         
     
 
