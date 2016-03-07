@@ -1,11 +1,11 @@
 # coding: utf-8
-from copy import copy
 import re
 import sys
 try:
     from urlparse import parse_qs
 except ImportError:
     from urllib.parse import parse_qs
+import unittest
 
 from django.test.utils import override_settings
 from django.core.urlresolvers import reverse
@@ -63,7 +63,6 @@ class OrderTextMixin(object):
         preview = self.ready_to_place_an_order(is_guest=True)
         worldpay = preview.forms['place_order_form'].submit()
         
-        redirect = worldpay.location
         data = parse_qs(worldpay.location.split("?")[1])
         
         worldpay_agent = self.app_class(extra_environ=self.extra_environ)
@@ -98,7 +97,6 @@ class TestPlacingOrder(OrderTextMixin, WebTestCase, CheckoutMixin):
         preview = self.ready_to_place_an_order(is_guest=True)
         worldpay = preview.forms['place_order_form'].submit()
         
-        redirect = worldpay.location
         data = parse_qs(worldpay.location.split("?")[1])
         
         worldpay_agent = self.app_class(extra_environ=self.extra_environ)
@@ -126,12 +124,11 @@ class TestPlacingOrder(OrderTextMixin, WebTestCase, CheckoutMixin):
         
         self.assertIn('Your order has been placed and a confirmation email has been sent', preview)
         self.assertIn('reference: 012345', preview)
-    
+
     def test_reloading_confirmation_page_with_race_condition_session_does_not_duplicate_order_but_still_redirects_to_thanks(self):
         preview = self.ready_to_place_an_order(is_guest=True)
         worldpay = preview.forms['place_order_form'].submit()
         
-        redirect = worldpay.location
         data = parse_qs(worldpay.location.split("?")[1])
         
         worldpay_agent = self.app_class(extra_environ=self.extra_environ)
@@ -198,7 +195,6 @@ class TestPlacingOrder(OrderTextMixin, WebTestCase, CheckoutMixin):
         preview = self.ready_to_place_an_order(is_guest=True)
         worldpay = preview.forms['place_order_form'].submit()
         
-        redirect = worldpay.location
         data = parse_qs(worldpay.location.split("?")[1])
         
         worldpay_agent = self.app_class(extra_environ=self.extra_environ)
@@ -230,7 +226,6 @@ class TestPlacingOrder(OrderTextMixin, WebTestCase, CheckoutMixin):
         preview = self.ready_to_place_an_order(is_guest=True)
         worldpay = preview.forms['place_order_form'].submit()
         
-        redirect = worldpay.location
         data = parse_qs(worldpay.location.split("?")[1])
         
         worldpay_agent = self.app_class(extra_environ=self.extra_environ)
@@ -266,7 +261,6 @@ class TestPlacingOrderWithRejectedCardFails(OrderTextMixin, WebTestCase, Checkou
         preview = self.ready_to_place_an_order(is_guest=True)
         worldpay = preview.forms['place_order_form'].submit()
         
-        redirect = worldpay.location
         data = parse_qs(worldpay.location.split("?")[1])
         
         worldpay_agent = self.app_class(extra_environ=self.extra_environ)
