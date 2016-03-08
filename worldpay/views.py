@@ -48,7 +48,11 @@ class SuccessView(OrderPlacementMixin, View):
             # If we've already completed a checkout session, just redirect to confirmation.
             return HttpResponseRedirect(self.get_success_url())
 
-        order_number = self.checkout_session.get_order_number()
+        #order_number = self.checkout_session.get_order_number()
+        
+        order_number = request.GET.get('order_number', '')
+        
+        
         # Flush all session data
         self.checkout_session.flush()
 
@@ -84,6 +88,9 @@ class CallbackResponseView(OrderPlacementMixin, View):
         except PaymentError as e:
             #messages.error(self.request, str(e))
             #self.restore_frozen_basket()
+            
+            logger.error(str(e))
+            
             return TemplateResponse(request, 'worldpay/worldpay_response.html', {'url': self.request.build_absolute_uri(reverse("worldpay-fail") + "?error=%s" % str(e))})
 
         basket = Basket.objects.get(pk=data['M_basket'])
@@ -131,7 +138,10 @@ class CallbackResponseView(OrderPlacementMixin, View):
             calc_total,
             **order_kwargs
         )
-        return TemplateResponse(request, 'worldpay/worldpay_response.html', {'url': self.request.build_absolute_uri(reverse("worldpay-success"))})
+        
+        success_url = self.request.build_absolute_uri(reverse("worldpay-success") + '?order_number=%s' % (order_number))
+        
+        return TemplateResponse(request, 'worldpay/worldpay_response.html', {'url': success_url })
         
     
 
@@ -141,6 +151,7 @@ class PaymentDetailsView(OscarPaymentDetailsView):
     def get_context_data(self, **kwargs):
         kwargs['WORLDPAY_INSTANCE_ID'] = settings.WORLDPAY_INSTANCE_ID
         data = super(PaymentDetailsView, self).get_context_data(**kwargs)
+        
         return data
     
     def handle_payment(self, order_number, total, **kwargs):
