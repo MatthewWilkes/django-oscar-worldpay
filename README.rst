@@ -103,7 +103,8 @@ Changelog
 1.3 (Unreleased)
 ----------------
 
-* Nothing yet
+* Fix a bug where the reliability fix included in 1.2 would not work if the two requests were almost simultanous.
+  [bharling, mwilkes]
 
 1.2 (2015-10-22)
 ----------------
@@ -121,17 +122,21 @@ Changelog
 ----------------
 
 * Fix a bug when phonenumber wasn't set.
+  [mwilkes]
 * Remove some old PayPal references that were missed.
+  [mwilkes]
 
 1.0 (2015-09-28)
 ----------------
 
 * Initial release. Working integration of Worldpay and Oscar.
+  [mwilkes]
 
 0.1
 ~~~
 
 * Skeleton of Worldpay integration, supporting making requests and receiving callbacks.
+  [mwilkes]
 
 0.0
 ~~~
